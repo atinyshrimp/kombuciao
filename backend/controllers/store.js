@@ -123,12 +123,6 @@ async function listStores(req, res, next) {
 		const stores = response?.results || [];
 		const total = response?.total[0]?.value || 0;
 
-		if (!stores.length) {
-			return res
-				.status(404)
-				.json({ ok: false, error: "No stores with recent availability" });
-		}
-
 		return res.json({ ok: true, data: stores, total });
 	} catch (err) {
 		next(err);
