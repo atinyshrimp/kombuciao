@@ -19,45 +19,56 @@ async function createStore(req, res, next) {
 
 async function listStores(req, res, next) {
 	try {
-		const { lat, lng, radius = 5000, page = 1, pageSize = 10 } = req.query;
+		const {
+			lat,
+			lng,
+			name,
+			radius = 5000,
+			page = 1,
+			pageSize = 10,
+		} = req.query;
 		let query = {};
 
-		let total = 0;
+		// let total = 0;
+		const stages = [];
 		if (lat && lng) {
-			query.location = {
-				$near: {
-					$geometry: {
+			stages.push({
+				$geoNear: {
+					near: {
 						type: "Point",
 						coordinates: [parseFloat(lng), parseFloat(lat)],
 					},
-					$maxDistance: parseInt(radius, 10), // default to 5km if no radius provided
+					distanceField: "dist.calculated",
+					maxDistance: parseInt(radius),
+					spherical: true,
 				},
-			};
+			});
+		}
 
-			total = await Store.aggregate([
-				{
-					$geoNear: {
-						near: {
-							type: "Point",
-							coordinates: [parseFloat(lng), parseFloat(lat)],
-						},
-						distanceField: "dist.calculated",
-						maxDistance: parseInt(radius),
-						spherical: true,
-					},
-				},
-				{ $count: "total" },
-			]);
-		} else total = await Store.countDocuments(query);
+		if (name) query.name = { $regex: name, $options: "i" };
 
-		const stores = await Store.find(query)
-			.skip((page - 1) * pageSize)
-			.limit(pageSize);
+		if (Object.keys(query).length > 0) stages.push({ $match: query });
+		// stages.push({ $sort: { createdAt: -1 } });
+		stages.push({ $skip: (page - 1) * pageSize });
+		stages.push({ $limit: parseInt(pageSize) });
+
+		console.log("Aggregation stages:", JSON.stringify(stages, null, 2));
+		const stores = await Store.aggregate(stages);
+
+		console.log(
+			"Aggregation stages for total count:",
+			JSON.stringify(stages.slice(0, -2).push({ $count: "total" }), null, 2)
+		);
+
+		const totalStages = stages.slice(0, -2).concat([{ $count: "total" }]);
+		console.log("Total stages:", JSON.stringify(totalStages, null, 2));
+
+		const total = await Store.aggregate(totalStages);
 
 		if (!stores || stores.length === 0)
 			return res.status(404).json({ ok: false, error: "No stores found" });
 
-		res.json({ ok: true, data: stores, total });
+		res.json({ ok: true, data: stores, total: total[0]?.total || 0 });
 	} catch (error) {
 		console.error("Error listing stores:", error);
 		res.status(500).json({ error: "Failed to list stores" });
