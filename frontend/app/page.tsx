@@ -1,103 +1,284 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+import { useState, useEffect } from "react";
+import { LocateFixed, SearchIcon } from "lucide-react";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+import { FLAVORS } from "@/constants";
+import api from "@/lib/api";
+import type { Store } from "@/types/store";
+
+/**
+ * Tailwind breakpoints: side panel sticks on md+; slides up on mobile.
+ * Placeholder Map uses a grey box. Replace with Mapbox/Leaflet later.
+ */
+export default function HomePage() {
+	const [showMobileList, setShowMobileList] = useState(false);
+	const [search, setSearch] = useState("");
+	const [radius, setRadius] = useState(5000); // 10 km default
+	const [onlyAvailable, setOnlyAvailable] = useState(false);
+	const [selectedFlavor, setSelectedFlavor] = useState<string | null>(null);
+	const [location, setLocation] = useState<[number, number]>([
+		2.3522219, 48.856614,
+	]);
+
+	return (
+		<div className="h-full w-full flex flex-col gap-5 md:flex-row bg-muted text-foreground">
+			{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
+			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 border-r bg-background overflow-y-auto">
+				<Header search={search} setSearch={setSearch} />
+				<Filters
+					radius={radius}
+					setRadius={setRadius}
+					onlyAvailable={onlyAvailable}
+					setOnlyAvailable={setOnlyAvailable}
+					selectedFlavor={selectedFlavor}
+					setSelectedFlavor={setSelectedFlavor}
+				/>
+				<StoreList
+					flavor={selectedFlavor}
+					onlyAvailable={onlyAvailable}
+					radius={radius}
+					location={location}
+				/>
+			</aside>
+
+			{/* ───────────────── MAP ───────────────── */}
+			<section className="flex-1 relative h-full md:h-auto">
+				<PlaceholderMap />
+				{/* Mobile toggle */}
+				<Button
+					variant="secondary"
+					className="md:hidden cursor-pointer absolute top-4 left-4 z-20 shadow-lg"
+					onClick={() => setShowMobileList(true)}
+				>
+					Stores & Filters
+				</Button>
+			</section>
+
+			{/* ───────────────── MOBILE DRAWER ───────────────── */}
+			<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
+				<SheetContent side="bottom" className="p-4 pb-8">
+					<SheetHeader>
+						<div className="w-full h-1.5 rounded-full bg-muted-foreground/40 mx-auto mb-2" />
+					</SheetHeader>
+					<Header search={search} setSearch={setSearch} />
+					<Filters
+						radius={radius}
+						setRadius={setRadius}
+						onlyAvailable={onlyAvailable}
+						setOnlyAvailable={setOnlyAvailable}
+						selectedFlavor={selectedFlavor}
+						setSelectedFlavor={setSelectedFlavor}
+					/>
+					<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
+						<StoreList
+							flavor={selectedFlavor}
+							onlyAvailable={onlyAvailable}
+							radius={radius}
+							location={location}
+						/>
+					</div>
+				</SheetContent>
+			</Sheet>
+		</div>
+	);
+}
+
+/* ───────────────── SUB‑COMPONENTS ───────────────── */
+
+function Header({
+	search,
+	setSearch,
+}: {
+	search: string;
+	setSearch: (v: string) => void;
+}) {
+	return (
+		<div className="relative">
+			<Input
+				value={search}
+				onChange={(e) => setSearch(e.target.value)}
+				placeholder="Search stores…"
+				className="text-sm ps-9 peer"
+			/>
+			<div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+				<SearchIcon size={16} aria-hidden="true" />
+			</div>
+		</div>
+	);
+}
+
+interface FiltersProps {
+	radius: number;
+	setRadius: (v: number) => void;
+	onlyAvailable: boolean;
+	setOnlyAvailable: (v: boolean) => void;
+	selectedFlavor: string | null;
+	setSelectedFlavor: (v: string | null) => void;
+}
+
+function Filters({
+	radius,
+	setRadius,
+	onlyAvailable,
+	setOnlyAvailable,
+	selectedFlavor,
+	setSelectedFlavor,
+}: FiltersProps) {
+	const [currentRadius, setCurrentRadius] = useState(radius);
+
+	return (
+		<Card className="p-4 space-y-4 bg-card">
+			<div className="flex items-center justify-between">
+				<span className="text-sm font-medium">Only in stock</span>
+				<Switch
+					className="cursor-pointer"
+					checked={onlyAvailable}
+					onCheckedChange={setOnlyAvailable}
+				/>
+			</div>
+
+			<div>
+				<label className="text-sm font-medium">
+					Radius: {currentRadius / 1000} km
+				</label>
+				<Slider
+					min={500}
+					max={30000}
+					step={500}
+					value={[currentRadius]}
+					onValueChange={(v) => setCurrentRadius(v[0])}
+					onValueCommit={(v) => setRadius(v[0])}
+				/>
+			</div>
+
+			<div>
+				<label className="text-sm font-medium">Flavor</label>
+				<div className="flex flex-wrap gap-2 mt-2">
+					{Object.entries(FLAVORS).map(([key, label]) => (
+						<Button
+							key={key}
+							variant={selectedFlavor === key ? "default" : "secondary"}
+							size="sm"
+							onClick={() =>
+								setSelectedFlavor(selectedFlavor === key ? null : key)
+							}
+							className="px-3 cursor-pointer"
+						>
+							{label}
+						</Button>
+					))}
+				</div>
+			</div>
+		</Card>
+	);
+}
+
+function StoreList({
+	location,
+	flavor,
+	onlyAvailable,
+	radius,
+}: {
+	location?: [number, number]; // [longitude, latitude]
+	flavor?: string | null;
+	onlyAvailable?: boolean;
+	radius?: number;
+}) {
+	const [stores, setStores] = useState<Store[] | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	async function fetchStores() {
+		setLoading(true);
+		try {
+			let queryParams = new URLSearchParams();
+			if (flavor) queryParams.append("flavor", flavor);
+			if (onlyAvailable) queryParams.append("onlyAvailable", "true");
+			if (location) {
+				queryParams.append("lng", location[0].toString());
+				queryParams.append("lat", location[1].toString());
+			}
+			if (radius) queryParams.append("radius", radius.toString());
+
+			const { ok, data, error } = await api.get(
+				`/stores?${queryParams.toString()}`
+			);
+			if (!ok) throw new Error(error);
+			setStores(data as Store[]);
+		} catch (error) {
+			if (error === "No stores with recent availability") setStores([]);
+			console.error("Error fetching stores:", error);
+		} finally {
+			setLoading(false);
+		}
+	}
+	useEffect(() => {
+		fetchStores();
+	}, [location, flavor, onlyAvailable, radius]);
+
+	// placeholder skeleton list
+	const dummy = new Array(5).fill(0);
+	const list = stores || dummy; // use actual stores if available, otherwise dummy
+
+	if (loading) {
+		return (
+			<div className="space-y-3">
+				{dummy.map((_, i) => (
+					<Card
+						key={i}
+						className={cn(
+							"p-4 flex items-center gap-3 cursor-pointer hover:bg-accent"
+						)}
+					>
+						<PlaceholderMap />
+					</Card>
+				))}
+			</div>
+		);
+	}
+
+	return (
+		<div className="space-y-3">
+			{(!stores || !stores.length) && (
+				<Card className="p-4 text-center">
+					<p className="text-sm text-muted-foreground">
+						No stores found in this area.
+					</p>
+				</Card>
+			)}
+			{stores &&
+				stores.map((store, i) => (
+					<Card
+						key={i}
+						className={cn(
+							"p-4 flex items-center gap-3 cursor-pointer hover:bg-accent"
+						)}
+					>
+						<div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
+							KB
+						</div>
+						<CardContent className="p-0 flex-1">
+							<p className="text-sm font-medium">{store.name}</p>
+							<p className="text-xs text-muted-foreground">
+								{(store.distance! / 1000).toFixed(1)} km • Citron, Pêche
+							</p>
+						</CardContent>
+					</Card>
+				))}
+		</div>
+	);
+}
+
+function PlaceholderMap() {
+	return (
+		<div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900/90 rounded-lg animate-pulse" />
+	);
 }
