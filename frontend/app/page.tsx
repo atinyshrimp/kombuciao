@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LocateFixed, SearchIcon } from "lucide-react";
+import dynamic from "next/dynamic";
+import { SearchIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
@@ -16,6 +16,10 @@ import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 import { FLAVORS, PARIS_COORDINATES } from "@/constants";
 import api from "@/lib/api";
 import type { Store } from "@/types/store";
+const StoreMap = dynamic(() => import("@/components/map"), {
+	loading: () => <PlaceholderMap />,
+	ssr: false,
+});
 
 /**
  * Tailwind breakpoints: side panel sticks on md+; slides up on mobile.
@@ -82,7 +86,7 @@ export default function HomePage() {
 
 			{/* ───────────────── MAP ───────────────── */}
 			<section className="flex-1 relative h-full md:h-auto">
-				<PlaceholderMap />
+				<StoreMap stores={stores} radius={radius} />
 				{/* Mobile toggle */}
 				<Button
 					variant="secondary"
