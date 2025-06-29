@@ -24,12 +24,45 @@ import type { Store } from "@/types/store";
 export default function HomePage() {
 	const [showMobileList, setShowMobileList] = useState(false);
 	const [search, setSearch] = useState("");
-	const [radius, setRadius] = useState(5000); // 10 km default
+	const [radius, setRadius] = useState(5000); // 5 km default
 	const [onlyAvailable, setOnlyAvailable] = useState(false);
 	const [selectedFlavors, setSelectedFlavors] = useState<Option[]>([]);
 	const [location, setLocation] = useState<[number, number]>(
 		PARIS_COORDINATES as [number, number]
 	);
+	const [stores, setStores] = useState<Store[] | null>(null);
+	const [loading, setLoading] = useState(true);
+
+	async function fetchStores() {
+		setLoading(true);
+		try {
+			let queryParams = new URLSearchParams();
+			if (selectedFlavors)
+				for (const flavor of selectedFlavors) {
+					queryParams.append("flavor", flavor.value);
+				}
+			if (onlyAvailable) queryParams.append("onlyAvailable", "true");
+			if (location) {
+				queryParams.append("lng", location[0].toString());
+				queryParams.append("lat", location[1].toString());
+			}
+			if (radius) queryParams.append("radius", radius.toString());
+
+			const { ok, data, error } = await api.get(
+				`/stores?${queryParams.toString()}`
+			);
+			if (!ok) throw new Error(error);
+			setStores(data as Store[]);
+		} catch (error) {
+			if (error === "No stores with recent availability") setStores([]);
+			console.error("Error fetching stores:", error);
+		} finally {
+			setLoading(false);
+		}
+	}
+	useEffect(() => {
+		fetchStores();
+	}, [location, selectedFlavors, onlyAvailable, radius]);
 
 	return (
 		<div className="h-full w-full flex flex-col gap-5 md:flex-row bg-muted text-foreground">
@@ -44,12 +77,7 @@ export default function HomePage() {
 					selectedFlavors={selectedFlavors}
 					setSelectedFlavors={setSelectedFlavors}
 				/>
-				<StoreList
-					flavors={selectedFlavors.map((f) => f.value)}
-					onlyAvailable={onlyAvailable}
-					radius={radius}
-					location={location}
-				/>
+				<StoreList stores={stores} loading={loading} />
 			</aside>
 
 			{/* ───────────────── MAP ───────────────── */}
@@ -81,12 +109,7 @@ export default function HomePage() {
 						setSelectedFlavors={setSelectedFlavors}
 					/>
 					<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
-						<StoreList
-							flavors={selectedFlavors.map((f) => f.value)}
-							onlyAvailable={onlyAvailable}
-							radius={radius}
-							location={location}
-						/>
+						<StoreList stores={stores} loading={loading} />
 					</div>
 				</SheetContent>
 			</Sheet>
@@ -187,50 +210,12 @@ function Filters({
 }
 
 function StoreList({
-	location,
-	flavors,
-	onlyAvailable,
-	radius,
+	stores,
+	loading,
 }: {
-	location?: [number, number]; // [longitude, latitude]
-	flavors?: string[] | null;
-	onlyAvailable?: boolean;
-	radius?: number;
+	stores: Store[] | null;
+	loading: boolean;
 }) {
-	const [stores, setStores] = useState<Store[] | null>(null);
-	const [loading, setLoading] = useState(true);
-
-	async function fetchStores() {
-		setLoading(true);
-		try {
-			let queryParams = new URLSearchParams();
-			if (flavors)
-				for (const flavor of flavors) {
-					queryParams.append("flavor", flavor);
-				}
-			if (onlyAvailable) queryParams.append("onlyAvailable", "true");
-			if (location) {
-				queryParams.append("lng", location[0].toString());
-				queryParams.append("lat", location[1].toString());
-			}
-			if (radius) queryParams.append("radius", radius.toString());
-
-			const { ok, data, error } = await api.get(
-				`/stores?${queryParams.toString()}`
-			);
-			if (!ok) throw new Error(error);
-			setStores(data as Store[]);
-		} catch (error) {
-			if (error === "No stores with recent availability") setStores([]);
-			console.error("Error fetching stores:", error);
-		} finally {
-			setLoading(false);
-		}
-	}
-	useEffect(() => {
-		fetchStores();
-	}, [location, flavors, onlyAvailable, radius]);
-
 	// placeholder skeleton list
 	const dummy = new Array(6).fill(0);
 
