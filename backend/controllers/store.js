@@ -26,11 +26,16 @@ async function listStores(req, res, next) {
 			radius = 5000,
 			page = 1,
 			pageSize = 10,
+			onlyAvailable = false,
 		} = req.query;
-		let query = {};
 
-		// let total = 0;
+		const skip = (page - 1) * pageSize;
+		const limit = parseInt(pageSize, 10);
+
+		/* ---------- Base pipeline ---------- */
 		const stages = [];
+
+		/* 1️⃣  Geo filter (must be first) */
 		if (lat && lng) {
 			stages.push({
 				$geoNear: {
@@ -38,41 +43,84 @@ async function listStores(req, res, next) {
 						type: "Point",
 						coordinates: [parseFloat(lng), parseFloat(lat)],
 					},
-					distanceField: "dist.calculated",
-					maxDistance: parseInt(radius),
+					distanceField: "distance",
+					maxDistance: parseInt(radius, 10),
 					spherical: true,
 				},
 			});
 		}
 
-		if (name) query.name = { $regex: name, $options: "i" };
+		/* 2️⃣  Name filter (optional) */
+		if (name) {
+			stages.push({ $match: { name: { $regex: name, $options: "i" } } });
+		}
 
-		if (Object.keys(query).length > 0) stages.push({ $match: query });
-		// stages.push({ $sort: { createdAt: -1 } });
-		stages.push({ $skip: (page - 1) * pageSize });
-		stages.push({ $limit: parseInt(pageSize) });
+		/* 3️⃣  Lookup only recent reports */
+		stages.push({
+			$lookup: {
+				from: "reports",
+				let: { storeId: "$_id" },
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [{ $eq: ["$store", "$$storeId"] }],
+							},
+						},
+					},
+					{ $project: { flavors: 1 } },
+				],
+				as: "recentReports",
+			},
+		});
 
-		console.log("Aggregation stages:", JSON.stringify(stages, null, 2));
-		const stores = await Store.aggregate(stages);
+		/* 4️⃣  Keep stores that actually have reports */
+		if (onlyAvailable)
+			stages.push({ $match: { "recentReports.0": { $exists: true } } });
 
-		console.log(
-			"Aggregation stages for total count:",
-			JSON.stringify(stages.slice(0, -2).push({ $count: "total" }), null, 2)
-		);
+		/* 5️⃣  Merge flavours from recent reports */
+		stages.push({
+			$addFields: {
+				flavors: {
+					$reduce: {
+						input: "$recentReports.flavors",
+						initialValue: [],
+						in: { $setUnion: ["$$value", "$$this"] },
+					},
+				},
+			},
+		});
 
-		const totalStages = stages.slice(0, -2).concat([{ $count: "total" }]);
-		console.log("Total stages:", JSON.stringify(totalStages, null, 2));
+		/* 6️⃣ Remove recent reports from final output */
+		stages.push({
+			$project: {
+				recentReports: 0,
+			},
+		});
 
-		const total = await Store.aggregate(totalStages);
+		/* 7️⃣ Facet for pagination + total count */
+		stages.push({
+			$facet: {
+				results: [{ $skip: skip }, { $limit: limit }],
+				total: [{ $count: "value" }],
+			},
+		});
 
-		if (!stores || stores.length === 0)
-			return res.status(404).json({ ok: false, error: "No stores found" });
+		/* ---------- Execute aggregation ---------- */
+		const [response] = await Store.aggregate(stages);
 
-		res.json({ ok: true, data: stores, total: total[0]?.total || 0 });
-	} catch (error) {
-		console.error("Error listing stores:", error);
-		res.status(500).json({ error: "Failed to list stores" });
-		next(error);
+		const stores = response?.results || [];
+		const total = response?.total[0]?.value || 0;
+
+		if (!stores.length) {
+			return res
+				.status(404)
+				.json({ ok: false, error: "No stores with recent availability" });
+		}
+
+		return res.json({ ok: true, data: stores, total });
+	} catch (err) {
+		next(err);
 	}
 }
 
