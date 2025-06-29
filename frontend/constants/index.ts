@@ -6,3 +6,10 @@ export const FLAVORS = {
 	menthe: "🍃 Menthe",
 	gingembre_hibiscus: "🌺 Gingembre Hibiscus",
 };
+
+export const ALLOWED_TYPES = [
+	"supermarket",
+	"convenience",
+	"organic",
+	"grocery",
+];

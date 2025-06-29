@@ -22,5 +22,6 @@ export interface Store {
 	createdAt: string;
 	updatedAt: string;
 	distance?: number; // Distance in meters, optional for search results
+	types?: [string];
 	__v: number;
 }
