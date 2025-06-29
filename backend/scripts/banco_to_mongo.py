@@ -88,7 +88,11 @@ def row_to_update(row):
         return None
 
     name = row.get("name") or row.get("brand") or "Unnamed"
-    address = f'{row.get("housenumber","")} {row.get("street","")}, {row.get("postcode","")} {row.get("city","")}'.strip()
+    address = {
+        "street": row.get("street", ""),
+        "city": row.get("city", ""),
+    }
+    types = [type.strip() for type in row.get("type", "").lower().split(";")]
 
     doc = {
         "name": name,
@@ -96,7 +100,9 @@ def row_to_update(row):
         "location": {
             "type": "Point",
             "coordinates": [lon, lat]
-        }
+        },
+        "openingHours": row.get("opening_hours", ""),
+        "types": types,
     }
 
     return UpdateOne(

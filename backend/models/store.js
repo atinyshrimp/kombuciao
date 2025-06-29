@@ -10,6 +10,7 @@ const StoreSchema = new mongoose.Schema(
 			coordinates: { type: [Number] }, // [lng, lat]
 		},
 		openingHours: { type: String, default: "" }, // e.g., "Mon-Fri 9-18"
+		types: { type: [String], default: [] }, // e.g., ["cafe", "shop"]
 	},
 	{ timestamps: true }
 );
