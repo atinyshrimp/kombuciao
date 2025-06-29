@@ -5,7 +5,7 @@ import { LocateFixed, SearchIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
@@ -109,7 +109,7 @@ function Header({
 			<Input
 				value={search}
 				onChange={(e) => setSearch(e.target.value)}
-				placeholder="Search stores…"
+				placeholder="Entrer une adresse ou une ville"
 				className="text-sm ps-9 peer"
 			/>
 			<div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
@@ -141,7 +141,11 @@ function Filters({
 	return (
 		<Card className="p-4 space-y-4 bg-card">
 			<div className="flex items-center justify-between">
-				<span className="text-sm font-medium">Only in stock</span>
+				<span className="text-sm font-medium">
+					Afficher uniquement les magasins
+					<br />
+					avec des produits disponibles
+				</span>
 				<Switch
 					className="cursor-pointer"
 					checked={onlyAvailable}
@@ -151,7 +155,7 @@ function Filters({
 
 			<div>
 				<label className="text-sm font-medium">
-					Radius: {currentRadius / 1000} km
+					Rayon : {currentRadius / 1000} km
 				</label>
 				<Slider
 					min={500}
@@ -164,7 +168,7 @@ function Filters({
 			</div>
 
 			<div>
-				<label className="text-sm font-medium">Flavor</label>
+				<label className="text-sm font-medium">Saveurs</label>
 				<div className="flex flex-wrap gap-2 mt-2">
 					<MultipleSelector
 						options={Object.entries(FLAVORS).map(([key, label]) => ({
