@@ -260,22 +260,7 @@ function StoreList({
 			)}
 			{stores &&
 				stores.map((store, i) => (
-					<Card
-						key={i}
-						className={cn(
-							"p-4 flex items-center gap-3 cursor-pointer hover:bg-accent"
-						)}
-					>
-						<div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
-							KB
-						</div>
-						<CardContent className="p-0 flex-1">
-							<p className="text-sm font-medium">{store.name}</p>
-							<p className="text-xs text-muted-foreground">
-								{(store.distance! / 1000).toFixed(1)} km • Citron, Pêche
-							</p>
-						</CardContent>
-					</Card>
+					<StoreCard key={store._id || i} store={store} />
 				))}
 		</div>
 	);
