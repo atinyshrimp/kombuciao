@@ -10,6 +10,9 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import MultipleSelector, { Option } from "@/components/ui/multiselect";
+import StoreCard from "@/components/cards/StoreCard";
+
 import { cn } from "@/lib/utils";
 import { FLAVORS } from "@/constants";
 import api from "@/lib/api";
@@ -24,7 +27,7 @@ export default function HomePage() {
 	const [search, setSearch] = useState("");
 	const [radius, setRadius] = useState(5000); // 10 km default
 	const [onlyAvailable, setOnlyAvailable] = useState(false);
-	const [selectedFlavor, setSelectedFlavor] = useState<string | null>(null);
+	const [selectedFlavors, setSelectedFlavors] = useState<Option[]>([]);
 	const [location, setLocation] = useState<[number, number]>([
 		2.3522219, 48.856614,
 	]);
@@ -39,11 +42,11 @@ export default function HomePage() {
 					setRadius={setRadius}
 					onlyAvailable={onlyAvailable}
 					setOnlyAvailable={setOnlyAvailable}
-					selectedFlavor={selectedFlavor}
-					setSelectedFlavor={setSelectedFlavor}
+					selectedFlavors={selectedFlavors}
+					setSelectedFlavors={setSelectedFlavors}
 				/>
 				<StoreList
-					flavor={selectedFlavor}
+					flavors={selectedFlavors.map((f) => f.value)}
 					onlyAvailable={onlyAvailable}
 					radius={radius}
 					location={location}
@@ -75,12 +78,12 @@ export default function HomePage() {
 						setRadius={setRadius}
 						onlyAvailable={onlyAvailable}
 						setOnlyAvailable={setOnlyAvailable}
-						selectedFlavor={selectedFlavor}
-						setSelectedFlavor={setSelectedFlavor}
+						selectedFlavors={selectedFlavors}
+						setSelectedFlavors={setSelectedFlavors}
 					/>
 					<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
 						<StoreList
-							flavor={selectedFlavor}
+							flavors={selectedFlavors.map((f) => f.value)}
 							onlyAvailable={onlyAvailable}
 							radius={radius}
 							location={location}
@@ -121,8 +124,8 @@ interface FiltersProps {
 	setRadius: (v: number) => void;
 	onlyAvailable: boolean;
 	setOnlyAvailable: (v: boolean) => void;
-	selectedFlavor: string | null;
-	setSelectedFlavor: (v: string | null) => void;
+	selectedFlavors: Option[];
+	setSelectedFlavors: (v: Option[]) => void;
 }
 
 function Filters({
@@ -130,8 +133,8 @@ function Filters({
 	setRadius,
 	onlyAvailable,
 	setOnlyAvailable,
-	selectedFlavor,
-	setSelectedFlavor,
+	selectedFlavors,
+	setSelectedFlavors,
 }: FiltersProps) {
 	const [currentRadius, setCurrentRadius] = useState(radius);
 
@@ -163,19 +166,17 @@ function Filters({
 			<div>
 				<label className="text-sm font-medium">Flavor</label>
 				<div className="flex flex-wrap gap-2 mt-2">
-					{Object.entries(FLAVORS).map(([key, label]) => (
-						<Button
-							key={key}
-							variant={selectedFlavor === key ? "default" : "secondary"}
-							size="sm"
-							onClick={() =>
-								setSelectedFlavor(selectedFlavor === key ? null : key)
-							}
-							className="px-3 cursor-pointer"
-						>
-							{label}
-						</Button>
-					))}
+					<MultipleSelector
+						options={Object.entries(FLAVORS).map(([key, label]) => ({
+							value: key,
+							label,
+						}))}
+						value={selectedFlavors}
+						onChange={setSelectedFlavors}
+						placeholder="Sélectionner des saveurs"
+						className="w-full"
+						hidePlaceholderWhenSelected
+					/>
 				</div>
 			</div>
 		</Card>
@@ -184,12 +185,12 @@ function Filters({
 
 function StoreList({
 	location,
-	flavor,
+	flavors,
 	onlyAvailable,
 	radius,
 }: {
 	location?: [number, number]; // [longitude, latitude]
-	flavor?: string | null;
+	flavors?: string[] | null;
 	onlyAvailable?: boolean;
 	radius?: number;
 }) {
@@ -200,7 +201,10 @@ function StoreList({
 		setLoading(true);
 		try {
 			let queryParams = new URLSearchParams();
-			if (flavor) queryParams.append("flavor", flavor);
+			if (flavors)
+				for (const flavor of flavors) {
+					queryParams.append("flavor", flavor);
+				}
 			if (onlyAvailable) queryParams.append("onlyAvailable", "true");
 			if (location) {
 				queryParams.append("lng", location[0].toString());
@@ -222,7 +226,7 @@ function StoreList({
 	}
 	useEffect(() => {
 		fetchStores();
-	}, [location, flavor, onlyAvailable, radius]);
+	}, [location, flavors, onlyAvailable, radius]);
 
 	// placeholder skeleton list
 	const dummy = new Array(5).fill(0);
