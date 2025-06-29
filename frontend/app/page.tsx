@@ -13,8 +13,7 @@ import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
-import { cn } from "@/lib/utils";
-import { FLAVORS } from "@/constants";
+import { FLAVORS, PARIS_COORDINATES } from "@/constants";
 import api from "@/lib/api";
 import type { Store } from "@/types/store";
 
@@ -28,9 +27,9 @@ export default function HomePage() {
 	const [radius, setRadius] = useState(5000); // 10 km default
 	const [onlyAvailable, setOnlyAvailable] = useState(false);
 	const [selectedFlavors, setSelectedFlavors] = useState<Option[]>([]);
-	const [location, setLocation] = useState<[number, number]>([
-		2.3522219, 48.856614,
-	]);
+	const [location, setLocation] = useState<[number, number]>(
+		PARIS_COORDINATES as [number, number]
+	);
 
 	return (
 		<div className="h-full w-full flex flex-col gap-5 md:flex-row bg-muted text-foreground">

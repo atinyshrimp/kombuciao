@@ -13,3 +13,5 @@ export const ALLOWED_TYPES = [
 	"organic",
 	"grocery",
 ];
+
+export const PARIS_COORDINATES = [2.3522219, 48.856614]; // Paris coordinates for default map view
