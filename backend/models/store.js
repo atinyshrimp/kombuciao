@@ -7,7 +7,7 @@ const StoreSchema = new mongoose.Schema(
 		location: {
 			// GeoJSON point
 			type: { type: String, default: "Point" },
-			coordinates: { type: [Number], index: "2dsphere" }, // [lng, lat]
+			coordinates: { type: [Number] }, // [lng, lat]
 		},
 		openingHours: { type: String, default: "" }, // e.g., "Mon-Fri 9-18"
 	},
