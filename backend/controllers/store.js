@@ -27,10 +27,12 @@ async function listStores(req, res, next) {
 			page = 1,
 			pageSize = 10,
 			onlyAvailable = false,
+			flavor,
 		} = req.query;
 
 		const skip = (page - 1) * pageSize;
 		const limit = parseInt(pageSize, 10);
+		const flavorArray = Array.isArray(flavor) ? flavor : flavor ? [flavor] : [];
 
 		/* ---------- Base pipeline ---------- */
 		const stages = [];
@@ -91,14 +93,23 @@ async function listStores(req, res, next) {
 			},
 		});
 
-		/* 6️⃣ Remove recent reports from final output */
+		/* 6️⃣  Filter on specific flavor(s), if provided */
+		if (flavorArray.length > 0) {
+			stages.push({
+				$match: {
+					flavors: { $all: flavorArray },
+				},
+			});
+		}
+
+		/* 7️⃣  Remove recentReports from output */
 		stages.push({
 			$project: {
 				recentReports: 0,
 			},
 		});
 
-		/* 7️⃣ Facet for pagination + total count */
+		/* 8️⃣  Facet for pagination + total */
 		stages.push({
 			$facet: {
 				results: [{ $skip: skip }, { $limit: limit }],
