@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
 import MultipleSelector, { Option } from "@/components/ui/multiselect";
-import StoreCard from "@/components/cards/StoreCard";
+import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
 import { cn } from "@/lib/utils";
 import { FLAVORS } from "@/constants";
@@ -233,21 +233,13 @@ function StoreList({
 	}, [location, flavors, onlyAvailable, radius]);
 
 	// placeholder skeleton list
-	const dummy = new Array(5).fill(0);
-	const list = stores || dummy; // use actual stores if available, otherwise dummy
+	const dummy = new Array(6).fill(0);
 
 	if (loading) {
 		return (
 			<div className="space-y-3">
 				{dummy.map((_, i) => (
-					<Card
-						key={i}
-						className={cn(
-							"p-4 flex items-center gap-3 cursor-pointer hover:bg-accent"
-						)}
-					>
-						<PlaceholderMap />
-					</Card>
+					<StoreCardSkeleton key={i} />
 				))}
 			</div>
 		);

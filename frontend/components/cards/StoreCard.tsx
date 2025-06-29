@@ -5,6 +5,7 @@ import { Store } from "@/types/store";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn, getAllowedTypes } from "@/lib/utils";
 import { FLAVORS } from "@/constants";
+import { Skeleton } from "../ui/skeleton";
 
 const StoreIcon = ({ type = "supermarket" }: { type: string }) => {
 	const SIZE = 18; // Default size for icons
@@ -19,6 +20,20 @@ const StoreIcon = ({ type = "supermarket" }: { type: string }) => {
 		default:
 			return <ShoppingCart size={SIZE} />;
 	}
+};
+
+const StoreCardSkeleton = () => {
+	return (
+		<Card className="p-4 flex items-start gap-3 cursor-pointer hover:bg-accent">
+			<CardContent className="p-0 flex flex-1 gap-4 w-full">
+				<Skeleton className="w-9 h-9 rounded-full flex-shrink-0" />
+				<div className="flex flex-col flex-1 gap-2">
+					<Skeleton className="h-4 w-3/4" />
+					<Skeleton className="h-3 w-1/2" />
+				</div>
+			</CardContent>
+		</Card>
+	);
 };
 
 const StoreCard = ({ store }: { store: Store }) => {
@@ -74,3 +89,4 @@ const StoreCard = ({ store }: { store: Store }) => {
 };
 
 export default StoreCard;
+export { StoreCard, StoreCardSkeleton };
