@@ -9,7 +9,12 @@ const reportRoutes = require("./routes/report.js");
 connectDB();
 
 const app = express();
-app.use(cors());
+app.use(
+	cors({
+		origin: ["http://localhost:3000"],
+		credentials: true, // Allow cookies to be sent
+	})
+); // CORS middleware
 app.use(express.json({ limit: "2mb" })); // body-parser
 
 app.get("/", (_, res) => res.json({ message: "Ciao Kombucha Locator API 😎" }));
