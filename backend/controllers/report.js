@@ -65,18 +65,32 @@ async function listReports(req, res, next) {
 
 async function confirmReport(req, res, next) {
 	try {
+		const { voterId } = req.body;
+		if (!voterId)
+			return res.status(401).json({ ok: false, error: "User ID is required" });
+
 		const reportId = req.params.id;
 		if (!reportId)
 			return res
 				.status(400)
 				.json({ ok: false, error: "Report ID is required" });
-		const r = await Report.findByIdAndUpdate(
+
+		// Check if user has already confirmed this report
+		const alreadyVoted = await Report.findOne({
+			_id: reportId,
+			"votes.voterId": voterId,
+		});
+		if (alreadyVoted)
+			return res.status(403).json({ ok: false, error: "Already voted" });
+
+		const updatedReport = await Report.findByIdAndUpdate(
 			reportId,
-			{ $inc: { confirms: 1 } },
+			{ $push: { votes: { voterId: voterId, type: "confirm" } } },
 			{ new: true }
 		);
-		if (!r) return res.status(404).json({ error: "Not found" });
-		res.status(200).json({ ok: true, data: r });
+		if (!updatedReport) return res.status(404).json({ error: "Not found" });
+
+		res.status(200).json({ ok: true, data: updatedReport });
 	} catch (e) {
 		next(e);
 	}
@@ -84,18 +98,33 @@ async function confirmReport(req, res, next) {
 
 async function denyReport(req, res, next) {
 	try {
+		const { voterId } = req.body;
+		if (!voterId)
+			return res.status(401).json({ ok: false, error: "User ID is required" });
+
 		const reportId = req.params.id;
 		if (!reportId)
 			return res
 				.status(400)
 				.json({ ok: false, error: "Report ID is required" });
-		const r = await Report.findByIdAndUpdate(
+
+		// Check if user has already denied this report
+		const alreadyVoted = await Report.findOne({
+			_id: reportId,
+			"votes.voterId": voterId,
+		});
+		if (alreadyVoted)
+			return res.status(403).json({ ok: false, error: "Already voted" });
+
+		const updatedReport = await Report.findByIdAndUpdate(
 			reportId,
-			{ $inc: { denies: 1 } },
+			{ $push: { votes: { voterId: voterId, type: "deny" } } },
 			{ new: true }
 		);
-		if (!r) return res.status(404).json({ ok: false, error: "Not found" });
-		res.status(200).json({ ok: true, data: r });
+		if (!updatedReport)
+			return res.status(404).json({ ok: false, error: "Not found" });
+
+		res.status(200).json({ ok: true, data: updatedReport });
 	} catch (e) {
 		next(e);
 	}

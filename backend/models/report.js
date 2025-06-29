@@ -1,5 +1,20 @@
 const mongoose = require("mongoose");
 
+const voteSchema = new mongoose.Schema(
+	{
+		voterId: {
+			type: String,
+			required: true,
+		},
+		type: {
+			type: String,
+			enum: ["confirm", "deny"],
+			required: true,
+		},
+	},
+	{ createdAt: true }
+);
+
 const reportSchema = new mongoose.Schema(
 	{
 		store: {
@@ -20,8 +35,7 @@ const reportSchema = new mongoose.Schema(
 				],
 			},
 		],
-		confirms: { type: Number, default: 0 },
-		denies: { type: Number, default: 0 },
+		votes: [voteSchema],
 	},
 	{ timestamps: true }
 );
