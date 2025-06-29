@@ -35,6 +35,10 @@ const reportSchema = new mongoose.Schema(
 				],
 			},
 		],
+		description: {
+			type: String,
+			default: "",
+		},
 		votes: [voteSchema],
 	},
 	{ timestamps: true }

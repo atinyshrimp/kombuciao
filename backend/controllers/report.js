@@ -4,7 +4,7 @@ const Store = require("../models/store.js");
 
 async function createReport(req, res, next) {
 	try {
-		const { storeId, flavors } = req.body;
+		const { storeId, flavors, description } = req.body;
 		if (!storeId || !flavors || !Array.isArray(flavors) || flavors.length === 0)
 			return res
 				.status(400)
@@ -14,7 +14,11 @@ async function createReport(req, res, next) {
 		if (!store)
 			return res.status(404).json({ ok: false, error: "Store not found" });
 
-		const report = await Report.create({ store: storeId, flavors });
+		const report = await Report.create({
+			store: storeId,
+			flavors,
+			description,
+		});
 		res.status(201).json({ ok: true, data: report });
 	} catch (e) {
 		next(e);
