@@ -186,10 +186,79 @@ async function deleteStore(req, res, next) {
 	}
 }
 
+async function getStats(req, res, next) {
+	try {
+		const { lat, lng, radius = 5000, sinceDays = 7 } = req.query;
+		if ((!lat || !lng) && radius)
+			return res
+				.status(400)
+				.json({ ok: false, error: "Radius requires lat and lng" });
+
+		const sinceDate = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000);
+
+		const stages = [];
+		if (lat && lng) {
+			stages.push({
+				$geoNear: {
+					near: {
+						type: "Point",
+						coordinates: [parseFloat(lng), parseFloat(lat)],
+					},
+					distanceField: "distance",
+					maxDistance: parseInt(radius, 10),
+					spherical: true,
+				},
+			});
+		}
+		const totalStores = await Store.aggregate(
+			stages.concat([{ $count: "count" }])
+		);
+
+		const storesWithAvailability = await Store.aggregate(
+			stages.concat([
+				{
+					$lookup: {
+						from: "reports",
+						let: { storeId: "$_id" },
+						pipeline: [
+							{
+								$match: {
+									$expr: {
+										$and: [
+											{ $eq: ["$store", "$$storeId"] },
+											{ $gte: ["$createdAt", sinceDate] },
+										],
+									},
+								},
+							},
+						],
+						as: "recentReports",
+					},
+				},
+				{ $match: { "recentReports.0": { $exists: true } } },
+				{ $count: "count" },
+			])
+		);
+
+		res.json({
+			ok: true,
+			data: {
+				totalStores: totalStores[0]?.count || 0,
+				storesWithAvailability: storesWithAvailability[0]?.count || 0,
+			},
+		});
+	} catch (error) {
+		console.error("Error getting store stats:", error);
+		res.status(500).json({ ok: false, error: "Failed to get store stats" });
+		next(error);
+	}
+}
+
 module.exports = {
 	createStore,
 	listStores,
 	getStore,
 	updateStore,
 	deleteStore,
+	getStats,
 };
