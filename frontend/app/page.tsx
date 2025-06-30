@@ -139,7 +139,7 @@ export default function HomePage() {
 	return (
 		<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
 			{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
-			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 border-r bg-background max-h-full">
+			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 bg-background max-h-full">
 				<Header search={search} setSearch={setSearch} />
 				<Filters
 					radius={radius}
@@ -159,7 +159,12 @@ export default function HomePage() {
 
 			{/* ───────────────── MAP ───────────────── */}
 			<section className="flex-1 relative h-full md:h-auto">
-				<StoreMap stores={stores} radius={radius} location={location} />
+				<StoreMap
+					key={`storemap-${location?.[0]}-${location?.[1]}`}
+					stores={stores}
+					radius={radius}
+					location={location}
+				/>
 				{/* Mobile toggle */}
 				<Button
 					variant="secondary"
