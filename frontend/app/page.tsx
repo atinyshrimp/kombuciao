@@ -137,9 +137,9 @@ export default function HomePage() {
 	}, [currentPage, location, selectedFlavors, onlyAvailable, radius]);
 
 	return (
-		<div className="h-full w-full flex flex-col gap-5 md:flex-row bg-muted text-foreground">
+		<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
 			{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
-			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 border-r bg-background overflow-y-auto">
+			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 border-r bg-background max-h-full">
 				<Header search={search} setSearch={setSearch} />
 				<Filters
 					radius={radius}
@@ -299,11 +299,11 @@ function StoreList({
 	loading: boolean;
 }) {
 	// placeholder skeleton list
-	const dummy = new Array(6).fill(0);
+	const dummy = new Array(5).fill(0);
 
 	if (loading) {
 		return (
-			<div className="space-y-3">
+			<div className="space-y-3 h-full">
 				{dummy.map((_, i) => (
 					<StoreCardSkeleton key={i} />
 				))}
@@ -312,7 +312,7 @@ function StoreList({
 	}
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-3 h-full overflow-y-auto">
 			{(!stores || !stores.length) && (
 				<Card className="p-4 text-center">
 					<p className="text-sm text-muted-foreground">
