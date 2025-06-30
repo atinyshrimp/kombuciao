@@ -6,7 +6,7 @@ import L from "leaflet";
 import { useMemo } from "react";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
-import { get } from "http";
+import StatsCard from "./cards/StatsCard";
 
 // ---------- custom circular DivIcon factory ----------
 const size = 34; // px diameter
@@ -75,62 +75,69 @@ export default function StoreMap({
 	}, [location, radius, stores]);
 
 	return (
-		<MapContainer
-			center={center as L.LatLngExpression}
-			bounds={bounds}
-			className="absolute inset-0 z-0"
-			scrollWheelZoom
-		>
-			<TileLayer
-				url="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
-				attribution={`&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`}
+		<div className="relative w-full h-full">
+			<StatsCard
+				stores={stores || []}
+				center={center as [number, number]}
+				radius={radius}
 			/>
-
-			<Circle
+			<MapContainer
 				center={center as L.LatLngExpression}
-				radius={radius} // 5 km radius
-				pathOptions={{
-					color: "#3388ff",
-					fillColor: "#3388ff",
-					fillOpacity: 0.2,
-				}}
+				bounds={bounds}
+				className="absolute inset-0 z-0"
+				scrollWheelZoom
 			>
-				<Popup className="text-sm">
-					<p className="font-medium mb-1">{radius / 1000} km Radius</p>
-					<p className="text-xs text-muted-foreground">
-						Showing stores within {radius / 1000} km of your location
-					</p>
-				</Popup>
-			</Circle>
+				<TileLayer
+					url="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
+					attribution={`&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`}
+				/>
 
-			{stores &&
-				stores.length > 0 &&
-				stores.map((store) => (
-					<Marker
-						key={store._id}
-						position={
-							[
-								store.location.coordinates[1],
-								store.location.coordinates[0],
-							] as L.LatLngExpression
-						}
-						icon={getMarkerIcon(
-							store?.types && store.types.length > 0 ? store.types[0] : ""
-						)} // use first type for icon
-					>
-						<Popup minWidth={200} className="text-sm">
-							<p className="font-medium mb-1">{store.name}</p>
-							{store.flavors && (
-								<p className="mb-1">Flavors: {store.flavors.join(", ")}</p>
-							)}
-							{store.distance && (
-								<p className="text-xs text-muted-foreground">
-									À {(store.distance / 1000).toFixed(2)} km
-								</p>
-							)}
-						</Popup>
-					</Marker>
-				))}
-		</MapContainer>
+				<Circle
+					center={center as L.LatLngExpression}
+					radius={radius} // 5 km radius
+					pathOptions={{
+						color: "#3388ff",
+						fillColor: "#3388ff",
+						fillOpacity: 0.2,
+					}}
+				>
+					<Popup className="text-sm">
+						<p className="font-medium mb-1">{radius / 1000} km Radius</p>
+						<p className="text-xs text-muted-foreground">
+							Showing stores within {radius / 1000} km of your location
+						</p>
+					</Popup>
+				</Circle>
+
+				{stores &&
+					stores.length > 0 &&
+					stores.map((store) => (
+						<Marker
+							key={store._id}
+							position={
+								[
+									store.location.coordinates[1],
+									store.location.coordinates[0],
+								] as L.LatLngExpression
+							}
+							icon={getMarkerIcon(
+								store?.types && store.types.length > 0 ? store.types[0] : ""
+							)} // use first type for icon
+						>
+							<Popup minWidth={200} className="text-sm">
+								<p className="font-medium mb-1">{store.name}</p>
+								{store.flavors && (
+									<p className="mb-1">Flavors: {store.flavors.join(", ")}</p>
+								)}
+								{store.distance && (
+									<p className="text-xs text-muted-foreground">
+										À {(store.distance / 1000).toFixed(2)} km
+									</p>
+								)}
+							</Popup>
+						</Marker>
+					))}
+			</MapContainer>
+		</div>
 	);
 }
