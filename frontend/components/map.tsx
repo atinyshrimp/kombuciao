@@ -57,14 +57,6 @@ export default function StoreMap({
 	stores: Store[] | null;
 	radius?: number;
 }) {
-	if (!stores || stores.length === 0) {
-		return (
-			<div className="flex items-center justify-center h-full text-muted-foreground">
-				No stores found
-			</div>
-		);
-	}
-
 	// default center = Paris
 	const center = useMemo(() => {
 		if (stores && stores.length && stores[0].location?.coordinates) {
@@ -76,15 +68,21 @@ export default function StoreMap({
 		return PARIS_COORDINATES as L.LatLngExpression;
 	}, [stores]);
 
+	const bounds = useMemo(() => {
+		if (!stores || stores.length === 0)
+			return L.latLngBounds([PARIS_COORDINATES as [number, number]]);
+		return L.latLngBounds(
+			stores.map((store) => [
+				store.location.coordinates[1],
+				store.location.coordinates[0],
+			])
+		);
+	}, [stores]);
+
 	return (
 		<MapContainer
 			center={center as L.LatLngExpression}
-			bounds={L.latLngBounds(
-				stores.map((store) => [
-					store.location.coordinates[1],
-					store.location.coordinates[0],
-				])
-			)}
+			bounds={bounds}
 			className="absolute inset-0 z-0"
 			scrollWheelZoom
 		>
@@ -110,32 +108,34 @@ export default function StoreMap({
 				</Popup>
 			</Circle>
 
-			{stores.map((store) => (
-				<Marker
-					key={store._id}
-					position={
-						[
-							store.location.coordinates[1],
-							store.location.coordinates[0],
-						] as L.LatLngExpression
-					}
-					icon={getMarkerIcon(
-						store?.types && store.types.length > 0 ? store.types[0] : ""
-					)} // use first type for icon
-				>
-					<Popup minWidth={200} className="text-sm">
-						<p className="font-medium mb-1">{store.name}</p>
-						{store.flavors && (
-							<p className="mb-1">Flavors: {store.flavors.join(", ")}</p>
-						)}
-						{store.distance && (
-							<p className="text-xs text-muted-foreground">
-								À {(store.distance / 1000).toFixed(2)} km
-							</p>
-						)}
-					</Popup>
-				</Marker>
-			))}
+			{stores &&
+				stores.length > 0 &&
+				stores.map((store) => (
+					<Marker
+						key={store._id}
+						position={
+							[
+								store.location.coordinates[1],
+								store.location.coordinates[0],
+							] as L.LatLngExpression
+						}
+						icon={getMarkerIcon(
+							store?.types && store.types.length > 0 ? store.types[0] : ""
+						)} // use first type for icon
+					>
+						<Popup minWidth={200} className="text-sm">
+							<p className="font-medium mb-1">{store.name}</p>
+							{store.flavors && (
+								<p className="mb-1">Flavors: {store.flavors.join(", ")}</p>
+							)}
+							{store.distance && (
+								<p className="text-xs text-muted-foreground">
+									À {(store.distance / 1000).toFixed(2)} km
+								</p>
+							)}
+						</Popup>
+					</Marker>
+				))}
 		</MapContainer>
 	);
 }
