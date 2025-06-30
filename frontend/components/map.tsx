@@ -3,10 +3,21 @@
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
 import StatsCard from "./cards/StatsCard";
+
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+	iconRetinaUrl:
+		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+	iconUrl:
+		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+	shadowUrl:
+		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
 
 // ---------- custom circular DivIcon factory ----------
 const size = 34; // px diameter
@@ -36,13 +47,13 @@ const typeConfig: Record<string, { color: string; svg: string }> = {
 	},
 };
 
-function getMarkerIcon(type: string = "supermarket") {
-	const cfg = typeConfig[type] || typeConfig["supermarket"]; // default to supermarket if type not found
-	return new L.DivIcon({
-		html: iconHTML(cfg.color, cfg.svg),
+function getMarkerIcon(type: string) {
+	const config = typeConfig[type] || typeConfig.supermarket;
+	return L.divIcon({
+		html: iconHTML(config.color, config.svg),
+		className: "custom-marker-icon",
 		iconSize: [size, size],
 		iconAnchor: [size / 2, size / 2],
-		className: "marker-no-default",
 	});
 }
 
@@ -55,6 +66,9 @@ export default function StoreMap({
 	location?: [number, number];
 	radius?: number;
 }) {
+	const mapRef = useRef<L.Map | null>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
 	// default center = Paris
 	const center = useMemo(() => {
 		if (location && location.length === 2) {
@@ -74,18 +88,43 @@ export default function StoreMap({
 		);
 	}, [location, radius, stores]);
 
+	// Cleanup function to prevent map reuse errors
+	useEffect(() => {
+		return () => {
+			if (mapRef.current) {
+				mapRef.current.remove();
+				mapRef.current = null;
+			}
+		};
+	}, []);
+
+	// Key to force re-render when location changes significantly
+	const mapKey = useMemo(() => {
+		return `map-${location?.[0]}-${location?.[1]}-${Date.now()}`;
+	}, [location]);
+
 	return (
-		<div className="relative w-full h-full">
+		<div className="relative w-full h-full" ref={containerRef}>
 			<StatsCard
 				stores={stores || []}
 				center={center as [number, number]}
 				radius={radius}
 			/>
 			<MapContainer
+				key={mapKey} // Force re-render with key
 				center={center as L.LatLngExpression}
 				bounds={bounds}
 				className="absolute inset-0 z-0 rounded-lg"
 				scrollWheelZoom
+				ref={(mapInstance) => {
+					if (mapInstance) {
+						mapRef.current = mapInstance;
+					}
+				}}
+				// Add these props to prevent initialization issues
+				whenReady={() => {
+					// Map is ready, you can add additional initialization here if needed
+				}}
 			>
 				<TileLayer
 					url="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
@@ -94,7 +133,7 @@ export default function StoreMap({
 
 				<Circle
 					center={center as L.LatLngExpression}
-					radius={radius} // 5 km radius
+					radius={radius}
 					pathOptions={{
 						color: "#3388ff",
 						fillColor: "#3388ff",
