@@ -3,7 +3,7 @@
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
 import StatsCard from "./cards/StatsCard";
@@ -68,40 +68,45 @@ export default function StoreMap({
 }) {
 	const mapRef = useRef<L.Map | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const [mapKey, setMapKey] = useState(0);
+
+	// Force re-render with a new key when critical props change
+	useEffect(() => {
+		setMapKey((prev) => prev + 1);
+	}, [location?.[0], location?.[1]]);
+
+	// Cleanup function to prevent map reuse errors
+	useEffect(() => {
+		return () => {
+			if (mapRef.current) {
+				try {
+					mapRef.current.remove();
+				} catch (e) {
+					console.warn("Error removing map:", e);
+				}
+				mapRef.current = null;
+			}
+		};
+	}, [mapKey]); // Re-run cleanup when map key changes
 
 	// default center = Paris
 	const center = useMemo(() => {
 		if (location && location.length === 2) {
-			return location.reverse() as L.LatLngExpression;
+			return [location[0], location[1]] as L.LatLngExpression;
 		}
-		return PARIS_COORDINATES.reverse() as L.LatLngExpression;
-	}, [location, stores]);
+		return PARIS_COORDINATES as L.LatLngExpression;
+	}, [location]);
 
 	const bounds = useMemo(() => {
 		if (!stores || stores.length === 0)
-			return L.latLngBounds([PARIS_COORDINATES.reverse() as [number, number]]);
+			return L.latLngBounds([PARIS_COORDINATES as [number, number]]);
 		return L.latLngBounds(
 			stores.map((store) => [
 				store.location.coordinates[1],
 				store.location.coordinates[0],
 			])
 		);
-	}, [location, radius, stores]);
-
-	// Cleanup function to prevent map reuse errors
-	useEffect(() => {
-		return () => {
-			if (mapRef.current) {
-				mapRef.current.remove();
-				mapRef.current = null;
-			}
-		};
-	}, []);
-
-	// Key to force re-render when location changes significantly
-	const mapKey = useMemo(() => {
-		return `map-${location?.[0]}-${location?.[1]}-${Date.now()}`;
-	}, [location]);
+	}, [stores]);
 
 	return (
 		<div className="relative w-full h-full" ref={containerRef}>
@@ -111,7 +116,7 @@ export default function StoreMap({
 				radius={radius}
 			/>
 			<MapContainer
-				key={mapKey} // Force re-render with key
+				key={`map-${mapKey}`} // Force re-render with key
 				center={center as L.LatLngExpression}
 				bounds={bounds}
 				className="absolute inset-0 z-0 rounded-lg"
@@ -124,7 +129,11 @@ export default function StoreMap({
 				// Add these props to prevent initialization issues
 				whenReady={() => {
 					// Map is ready, you can add additional initialization here if needed
+					console.log("Map is ready");
 				}}
+				// Prevent container reuse
+				attributionControl={false}
+				zoomControl={true}
 			>
 				<TileLayer
 					url="https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png"
