@@ -23,10 +23,6 @@ const StoreMap = dynamic(() => import("@/components/map"), {
 	ssr: false,
 });
 
-/**
- * Tailwind breakpoints: side panel sticks on md+; slides up on mobile.
- * Placeholder Map uses a grey box. Replace with Mapbox/Leaflet later.
- */
 export default function HomePage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
@@ -163,7 +159,7 @@ export default function HomePage() {
 
 			{/* ───────────────── MAP ───────────────── */}
 			<section className="flex-1 relative h-full md:h-auto">
-				<StoreMap stores={stores} radius={radius} />
+				<StoreMap stores={stores} radius={radius} location={location} />
 				{/* Mobile toggle */}
 				<Button
 					variant="secondary"
