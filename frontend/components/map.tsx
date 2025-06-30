@@ -84,7 +84,7 @@ export default function StoreMap({
 			<MapContainer
 				center={center as L.LatLngExpression}
 				bounds={bounds}
-				className="absolute inset-0 z-0"
+				className="absolute inset-0 z-0 rounded-lg"
 				scrollWheelZoom
 			>
 				<TileLayer
