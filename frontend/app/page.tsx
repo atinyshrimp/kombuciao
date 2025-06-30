@@ -262,9 +262,9 @@ function Filters({
 					Rayon : {currentRadius / 1000} km
 				</label>
 				<Slider
-					min={500}
-					max={30000}
-					step={500}
+					min={100}
+					max={5000}
+					step={100}
 					value={[currentRadius]}
 					onValueChange={(v) => setCurrentRadius(v[0])}
 					onValueCommit={(v) => setRadius(v[0])}
