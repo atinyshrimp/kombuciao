@@ -1,4 +1,5 @@
 "use client";
+
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -14,11 +15,6 @@ function iconHTML(color: string, svg: string) {
 	return `<div style="width:${size}px;height:${size}px;background:${color};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.5);">
             ${svg}
           </div>`;
-}
-
-function svgString(IconComponent: any) {
-	// render icon into svg string (lucide provides .toString())
-	return IconComponent({ size: 18, color: "white" }).toString();
 }
 
 const typeConfig: Record<string, { color: string; svg: string }> = {
@@ -52,32 +48,31 @@ function getMarkerIcon(type: string = "supermarket") {
 
 export default function StoreMap({
 	stores,
-	radius = 5000,
+	location,
+	radius = 1000,
 }: {
 	stores: Store[] | null;
+	location?: [number, number];
 	radius?: number;
 }) {
 	// default center = Paris
 	const center = useMemo(() => {
-		if (stores && stores.length && stores[0].location?.coordinates) {
-			return [
-				stores[0].location.coordinates[1],
-				stores[0].location.coordinates[0],
-			];
+		if (location && location.length === 2) {
+			return location.reverse() as L.LatLngExpression;
 		}
-		return PARIS_COORDINATES as L.LatLngExpression;
-	}, [stores]);
+		return PARIS_COORDINATES.reverse() as L.LatLngExpression;
+	}, [location, stores]);
 
 	const bounds = useMemo(() => {
 		if (!stores || stores.length === 0)
-			return L.latLngBounds([PARIS_COORDINATES as [number, number]]);
+			return L.latLngBounds([PARIS_COORDINATES.reverse() as [number, number]]);
 		return L.latLngBounds(
 			stores.map((store) => [
 				store.location.coordinates[1],
 				store.location.coordinates[0],
 			])
 		);
-	}, [stores]);
+	}, [location, radius, stores]);
 
 	return (
 		<MapContainer
