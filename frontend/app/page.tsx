@@ -86,7 +86,7 @@ export default function HomePage() {
 		};
 
 		if (search) urlParams.search = search;
-		if (radius !== 5000) urlParams.radius = radius;
+		if (radius !== 1000) urlParams.radius = radius;
 		if (onlyAvailable) urlParams.onlyAvailable = true;
 		if (selectedFlavors.length > 0) {
 			urlParams.flavor = selectedFlavors.map((f) => f.value);
