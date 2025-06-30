@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { SearchIcon } from "lucide-react";
 
@@ -26,29 +27,91 @@ const StoreMap = dynamic(() => import("@/components/map"), {
  * Placeholder Map uses a grey box. Replace with Mapbox/Leaflet later.
  */
 export default function HomePage() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	// Initialize state from URL params or defaults
 	const [showMobileList, setShowMobileList] = useState(false);
-	const [search, setSearch] = useState("");
-	const [radius, setRadius] = useState(5000); // 5 km default
-	const [onlyAvailable, setOnlyAvailable] = useState(false);
-	const [selectedFlavors, setSelectedFlavors] = useState<Option[]>([]);
-	const [location, setLocation] = useState<[number, number]>(
-		PARIS_COORDINATES as [number, number]
+	const [search, setSearch] = useState(searchParams.get("search") || "");
+	const [radius, setRadius] = useState(
+		parseInt(searchParams.get("radius") || "1000")
 	);
+	const [onlyAvailable, setOnlyAvailable] = useState(
+		searchParams.get("onlyAvailable") === "true"
+	);
+	const [selectedFlavors, setSelectedFlavors] = useState<Option[]>(() => {
+		const flavors = searchParams.getAll("flavor");
+		return flavors.map((flavor) => ({
+			value: flavor,
+			label: FLAVORS[flavor as keyof typeof FLAVORS] || flavor,
+		}));
+	});
+	const [location, setLocation] = useState<[number, number]>(() => {
+		const lng = searchParams.get("lng") || PARIS_COORDINATES[1].toString();
+		const lat = searchParams.get("lat") || PARIS_COORDINATES[0].toString();
+		return [parseFloat(lng), parseFloat(lat)];
+	});
 	const [stores, setStores] = useState<Store[] | null>(null);
 	const [loading, setLoading] = useState(true);
+	// Function to update URL with current filter state
+	const updateURL = (
+		newParams: Record<string, string | string[] | number | boolean>
+	) => {
+		const params = new URLSearchParams();
+
+		// Add current params
+		Object.entries(newParams).forEach(([key, value]) => {
+			if (value === null || value === undefined || value === "") return;
+
+			if (Array.isArray(value)) {
+				value.forEach((v) => params.append(key, v.toString()));
+			} else if (typeof value === "boolean") {
+				if (value) params.set(key, "true");
+			} else {
+				params.set(key, value.toString());
+			}
+		});
+
+		// Update URL without triggering navigation
+		const newURL = `${window.location.pathname}?${params.toString()}`;
+		router.replace(newURL, { scroll: false });
+	};
+
+	// Update URL whenever filters change
+	useEffect(() => {
+		const urlParams: Record<string, string | string[] | number | boolean> = {
+		};
+
+		if (search) urlParams.search = search;
+		if (radius !== 5000) urlParams.radius = radius;
+		if (onlyAvailable) urlParams.onlyAvailable = true;
+		if (selectedFlavors.length > 0) {
+			urlParams.flavor = selectedFlavors.map((f) => f.value);
+		}
+		if (
+			location[0] !== PARIS_COORDINATES[0] ||
+			location[1] !== PARIS_COORDINATES[1]
+		) {
+			urlParams.lng = location[0];
+			urlParams.lat = location[1];
+		}
+
+		updateURL(urlParams);
+	}, [search, radius, onlyAvailable, selectedFlavors, location, currentPage]);
 
 	async function fetchStores() {
 		setLoading(true);
 		try {
 			let queryParams = new URLSearchParams();
+			queryParams.append("page", currentPage.toString());
 			if (selectedFlavors)
 				for (const flavor of selectedFlavors) {
 					queryParams.append("flavor", flavor.value);
 				}
 			if (onlyAvailable) queryParams.append("onlyAvailable", "true");
 			if (location) {
-				queryParams.append("lng", location[0].toString());
-				queryParams.append("lat", location[1].toString());
+				queryParams.append("lng", location[1].toString());
+				queryParams.append("lat", location[0].toString());
 			}
 			if (radius) queryParams.append("radius", radius.toString());
 
