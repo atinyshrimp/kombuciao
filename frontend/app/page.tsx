@@ -17,6 +17,7 @@ import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 import { FLAVORS, PARIS_COORDINATES } from "@/constants";
 import api from "@/lib/api";
 import type { Store } from "@/types/store";
+import StorePagination from "@/components/features/StorePagination";
 const StoreMap = dynamic(() => import("@/components/map"), {
 	loading: () => <PlaceholderMap />,
 	ssr: false,
@@ -53,6 +54,11 @@ export default function HomePage() {
 	});
 	const [stores, setStores] = useState<Store[] | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [currentPage, setCurrentPage] = useState(
+		parseInt(searchParams.get("page") || "1")
+	);
+	const [totalPages, setTotalPages] = useState(1);
+
 	// Function to update URL with current filter state
 	const updateURL = (
 		newParams: Record<string, string | string[] | number | boolean>
@@ -80,6 +86,7 @@ export default function HomePage() {
 	// Update URL whenever filters change
 	useEffect(() => {
 		const urlParams: Record<string, string | string[] | number | boolean> = {
+			page: currentPage,
 		};
 
 		if (search) urlParams.search = search;
@@ -115,10 +122,12 @@ export default function HomePage() {
 			}
 			if (radius) queryParams.append("radius", radius.toString());
 
-			const { ok, data, error } = await api.get(
+			const { ok, data, total, error } = await api.get(
 				`/stores?${queryParams.toString()}`
 			);
 			if (!ok) throw new Error(error);
+
+			setTotalPages(Math.ceil(total! / 10)); // Assuming 6 stores per page
 			setStores(data as Store[]);
 		} catch (error) {
 			if (error === "No stores with recent availability") setStores([]);
@@ -129,7 +138,7 @@ export default function HomePage() {
 	}
 	useEffect(() => {
 		fetchStores();
-	}, [location, selectedFlavors, onlyAvailable, radius]);
+	}, [currentPage, location, selectedFlavors, onlyAvailable, radius]);
 
 	return (
 		<div className="h-full w-full flex flex-col gap-5 md:flex-row bg-muted text-foreground">
@@ -145,6 +154,11 @@ export default function HomePage() {
 					setSelectedFlavors={setSelectedFlavors}
 				/>
 				<StoreList stores={stores} loading={loading} />
+				<StorePagination
+					currentPage={currentPage}
+					setCurrentPage={setCurrentPage}
+					totalPages={totalPages}
+				/>
 			</aside>
 
 			{/* ───────────────── MAP ───────────────── */}
@@ -177,6 +191,11 @@ export default function HomePage() {
 					/>
 					<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
 						<StoreList stores={stores} loading={loading} />
+						<StorePagination
+							currentPage={currentPage}
+							setCurrentPage={setCurrentPage}
+							totalPages={totalPages}
+						/>
 					</div>
 				</SheetContent>
 			</Sheet>
