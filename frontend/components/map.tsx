@@ -40,8 +40,8 @@ const typeConfig: Record<string, { color: string; svg: string }> = {
 	},
 };
 
-function getMarkerIcon(type: string = "grocery") {
-	const cfg = typeConfig[type] || typeConfig["grocery"]; // default to supermarket if type not found
+function getMarkerIcon(type: string = "supermarket") {
+	const cfg = typeConfig[type] || typeConfig["supermarket"]; // default to supermarket if type not found
 	return new L.DivIcon({
 		html: iconHTML(cfg.color, cfg.svg),
 		iconSize: [size, size],
