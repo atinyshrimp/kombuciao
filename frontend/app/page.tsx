@@ -82,7 +82,7 @@ export default function HomePage() {
 	// Update URL whenever filters change
 	useEffect(() => {
 		const urlParams: Record<string, string | string[] | number | boolean> = {
-			page: 1,
+			page: currentPage,
 		};
 
 		if (search) urlParams.search = search;
@@ -99,9 +99,10 @@ export default function HomePage() {
 			urlParams.lat = location[1];
 		}
 
+		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
-		setCurrentPage(1); // Reset to first page on filter change
-	}, [search, radius, onlyAvailable, selectedFlavors, location, currentPage]);
+		// setCurrentPage(1); // Reset to first page on filter change
+	}, [search, radius, onlyAvailable, selectedFlavors, location]);
 
 	async function fetchStores() {
 		setLoading(true);
@@ -141,7 +142,11 @@ export default function HomePage() {
 		<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
 			{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
 			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 bg-background max-h-full">
-				<Header search={search} setSearch={setSearch} />
+				<Header
+					search={search}
+					setSearch={setSearch}
+					setLocation={setLocation}
+				/>
 				<Filters
 					radius={radius}
 					setRadius={setRadius}
@@ -182,7 +187,11 @@ export default function HomePage() {
 					<SheetHeader>
 						<div className="w-full h-1.5 rounded-full bg-muted-foreground/40 mx-auto mb-2" />
 					</SheetHeader>
-					<Header search={search} setSearch={setSearch} />
+					<Header
+						search={search}
+						setSearch={setSearch}
+						setLocation={setLocation}
+					/>
 					<Filters
 						radius={radius}
 						setRadius={setRadius}
@@ -210,10 +219,58 @@ export default function HomePage() {
 function Header({
 	search,
 	setSearch,
+	setLocation,
 }: {
 	search: string;
 	setSearch: (v: string) => void;
+	setLocation: (v: [number, number]) => void;
 }) {
+	const [results, setResults] = useState([]);
+
+	async function fetchSearchResults(query: string) {
+		if (!query) {
+			setSearch("");
+			return;
+		}
+		try {
+			const response = await fetch(
+				`https://photon.komoot.io/api?q=${encodeURIComponent(
+					query
+				)}&lang=fr&limit=5`,
+				{
+					mode: "cors",
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+						Accept: "application/json",
+					},
+				}
+			);
+			if (!response.ok) throw new Error("Failed to fetch search results");
+			const data = await response.json();
+			if (!data.features || !Array.isArray(data.features))
+				throw new Error("Invalid search results format");
+			setResults(data.features);
+		} catch (error) {
+			console.error("Error fetching search results:", error);
+		}
+	}
+
+	useEffect(() => {
+		if (search) {
+			const timeoutId = setTimeout(() => fetchSearchResults(search), 2500);
+			return () => clearTimeout(timeoutId); // Cleanup on unmount or search change
+		} else setResults([]); // Clear results if search is empty
+	}, [search]);
+
+	function handleResultClick(result: any) {
+		const location = result.geometry.coordinates;
+		console.log("Selected location:", result.properties.name, location);
+		setLocation([location[1], location[0]] as [number, number]); // Set location in [lat, lng] format
+		// setSearch(result.properties.name);
+		setResults([]); // Clear results after selection
+	}
+
 	return (
 		<div className="relative">
 			<Input
@@ -225,6 +282,24 @@ function Header({
 			<div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
 				<SearchIcon size={16} aria-hidden="true" />
 			</div>
+			{results.length > 0 && (
+				<div className="absolute z-50 w-full top-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+					{results.map((result: any, index) => (
+						<div
+							key={result.properties.osm_id || index}
+							className="flex flex-col px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground border-b border-border last:border-b-0"
+							onClick={() => handleResultClick(result)}
+						>
+							<p>{result.properties.name}</p>
+							<p className="text-xs text-muted-foreground">
+								{`${result.properties.postcode} ${
+									result.properties.city || ""
+								}`}
+							</p>
+						</div>
+					))}
+				</div>
+			)}
 		</div>
 	);
 }
