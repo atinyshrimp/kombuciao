@@ -82,7 +82,7 @@ export default function HomePage() {
 	// Update URL whenever filters change
 	useEffect(() => {
 		const urlParams: Record<string, string | string[] | number | boolean> = {
-			page: currentPage,
+			page: 1,
 		};
 
 		if (search) urlParams.search = search;
@@ -100,6 +100,7 @@ export default function HomePage() {
 		}
 
 		updateURL(urlParams);
+		setCurrentPage(1); // Reset to first page on filter change
 	}, [search, radius, onlyAvailable, selectedFlavors, location, currentPage]);
 
 	async function fetchStores() {
