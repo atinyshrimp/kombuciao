@@ -85,7 +85,6 @@ export default function HomePage() {
 			page: currentPage,
 		};
 
-		if (search) urlParams.search = search;
 		if (radius !== 1000) urlParams.radius = radius;
 		if (onlyAvailable) urlParams.onlyAvailable = true;
 		if (selectedFlavors.length > 0) {
@@ -102,7 +101,7 @@ export default function HomePage() {
 		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
 		// setCurrentPage(1); // Reset to first page on filter change
-	}, [search, radius, onlyAvailable, selectedFlavors, location]);
+	}, [radius, onlyAvailable, selectedFlavors, location]);
 
 	async function fetchStores() {
 		setLoading(true);
@@ -226,6 +225,7 @@ function Header({
 	setLocation: (v: [number, number]) => void;
 }) {
 	const [results, setResults] = useState([]);
+	const [searching, setSearching] = useState(false);
 
 	async function fetchSearchResults(query: string) {
 		if (!query) {
@@ -236,7 +236,7 @@ function Header({
 			const response = await fetch(
 				`https://photon.komoot.io/api?q=${encodeURIComponent(
 					query
-				)}&lang=fr&limit=5`,
+				)}&lang=fr&limit=5&location_bias_scale=0.5`,
 				{
 					mode: "cors",
 					method: "GET",
@@ -257,7 +257,7 @@ function Header({
 	}
 
 	useEffect(() => {
-		if (search) {
+		if (search && searching) {
 			const timeoutId = setTimeout(() => fetchSearchResults(search), 2500);
 			return () => clearTimeout(timeoutId); // Cleanup on unmount or search change
 		} else setResults([]); // Clear results if search is empty
@@ -267,7 +267,8 @@ function Header({
 		const location = result.geometry.coordinates;
 		console.log("Selected location:", result.properties.name, location);
 		setLocation([location[1], location[0]] as [number, number]); // Set location in [lat, lng] format
-		// setSearch(result.properties.name);
+		setSearching(false);
+		setSearch(result.properties.name);
 		setResults([]); // Clear results after selection
 	}
 
@@ -275,6 +276,8 @@ function Header({
 		<div className="relative">
 			<Input
 				value={search}
+				onFocus={() => setSearching(true)}
+				onBlur={() => setSearching(false)}
 				onChange={(e) => setSearch(e.target.value)}
 				placeholder="Entrer une adresse ou une ville"
 				className="text-sm ps-9 peer"
