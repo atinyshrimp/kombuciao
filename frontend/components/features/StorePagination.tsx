@@ -37,14 +37,13 @@ const StorePagination = ({
 				{/* First page button */}
 				<PaginationItem>
 					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
 						onClick={() => {
 							setCurrentPage(1);
 						}}
 						aria-label="Go to first page"
 						aria-disabled={currentPage === 1 ? true : undefined}
-						role={currentPage === 1 ? "link" : undefined}
-					>
+						role={currentPage === 1 ? "link" : undefined}>
 						<ChevronFirstIcon size={16} aria-hidden="true" />
 					</PaginationLink>
 				</PaginationItem>
@@ -52,14 +51,13 @@ const StorePagination = ({
 				{/* Previous page button */}
 				<PaginationItem>
 					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
 						onClick={() => {
 							if (currentPage > 1) setCurrentPage(currentPage - 1);
 						}}
 						aria-label="Go to previous page"
 						aria-disabled={currentPage === 1 ? true : undefined}
-						role={currentPage === 1 ? "link" : undefined}
-					>
+						role={currentPage === 1 ? "link" : undefined}>
 						<ChevronLeftIcon size={16} aria-hidden="true" />
 					</PaginationLink>
 				</PaginationItem>
@@ -75,9 +73,9 @@ const StorePagination = ({
 				{pages.map((page) => (
 					<PaginationItem key={page}>
 						<PaginationLink
+							className="cursor-pointer"
 							onClick={() => setCurrentPage(page)}
-							isActive={page === currentPage}
-						>
+							isActive={page === currentPage}>
 							{page}
 						</PaginationLink>
 					</PaginationItem>
@@ -93,14 +91,13 @@ const StorePagination = ({
 				{/* Next page button */}
 				<PaginationItem>
 					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
 						onClick={() => {
 							if (currentPage < totalPages) setCurrentPage(currentPage + 1);
 						}}
 						aria-label="Go to next page"
 						aria-disabled={currentPage === totalPages ? true : undefined}
-						role={currentPage === totalPages ? "link" : undefined}
-					>
+						role={currentPage === totalPages ? "link" : undefined}>
 						<ChevronRightIcon size={16} aria-hidden="true" />
 					</PaginationLink>
 				</PaginationItem>
@@ -108,14 +105,13 @@ const StorePagination = ({
 				{/* Last page button */}
 				<PaginationItem>
 					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
 						onClick={() => {
 							setCurrentPage(totalPages);
 						}}
 						aria-label="Go to last page"
 						aria-disabled={currentPage === totalPages ? true : undefined}
-						role={currentPage === totalPages ? "link" : undefined}
-					>
+						role={currentPage === totalPages ? "link" : undefined}>
 						<ChevronLastIcon size={16} aria-hidden="true" />
 					</PaginationLink>
 				</PaginationItem>
