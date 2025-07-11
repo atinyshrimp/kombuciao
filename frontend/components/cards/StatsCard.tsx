@@ -34,10 +34,16 @@ const StatsCard = ({
 				lng: centerArr[1].toString(),
 			}).toString()}`
 		);
-		if (!ok) return;
+		if (!ok || !data) return;
+
+		// Type assertion for the data
+		const responseData = data as {
+			totalStores: number;
+			storesWithAvailability: number;
+		};
 		const stats = {
-			total: data.totalStores,
-			withKombucha: data.storesWithAvailability,
+			total: responseData.totalStores,
+			withKombucha: responseData.storesWithAvailability,
 		};
 
 		setStats(stats);
@@ -53,8 +59,7 @@ const StatsCard = ({
 		<Collapsible
 			className="absolute top-4 right-4 z-10 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-lg p-3 shadow-lg min-w-[200px]"
 			open={open}
-			onOpenChange={setOpen}
-		>
+			onOpenChange={setOpen}>
 			<CollapsibleTrigger className="w-full flex justify-between items-center text-sm font-medium text-gray-900 cursor-pointer">
 				<div>
 					Area Statistics{" "}
