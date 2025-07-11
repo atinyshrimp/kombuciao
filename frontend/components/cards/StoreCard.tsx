@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn, getAllowedTypes } from "@/lib/utils";
 import { FLAVORS } from "@/constants";
 import { Skeleton } from "../ui/skeleton";
+import { useStoreContext } from "@/lib/store-context";
 
 const StoreIcon = ({ type = "supermarket" }: { type: string }) => {
 	const SIZE = 18; // Default size for icons
@@ -37,12 +38,17 @@ const StoreCardSkeleton = () => {
 };
 
 const StoreCard = ({ store }: { store: Store }) => {
+	const { hoveredStore, setHoveredStore } = useStoreContext();
+	const isHovered = hoveredStore === store._id;
+
 	return (
 		<Card
 			className={cn(
-				"p-4 flex items-start gap-3 cursor-pointer hover:bg-accent"
+				"p-4 flex items-start gap-3 cursor-pointer transition-colors",
+				isHovered ? "bg-accent/80" : "hover:bg-accent"
 			)}
-		>
+			onMouseEnter={() => setHoveredStore(store._id)}
+			onMouseLeave={() => setHoveredStore(null)}>
 			<CardContent className="p-0 flex flex-1 gap-4">
 				<div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
 					<StoreIcon type={getAllowedTypes(store.types)} />
@@ -51,8 +57,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 					className={cn(
 						"flex flex-col",
 						store.flavors?.length === 0 ? "justify-center" : ""
-					)}
-				>
+					)}>
 					<p className="text-sm font-medium">
 						{store.name}
 						<span className="text-xs text-muted-foreground font-normal">
@@ -74,8 +79,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 								return (
 									<span
 										key={flavor}
-										className="text-xs bg-secondary p-1 rounded-full ring-1 ring-primary/20 cursor-default"
-									>
+										className="text-xs bg-secondary p-1 rounded-full ring-1 ring-primary/20 cursor-default">
 										{icon}
 									</span>
 								);

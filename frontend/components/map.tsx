@@ -1,59 +1,16 @@
 "use client";
 
-import { useRef, useEffect, useState, useMemo } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import { useMemo } from "react";
+import dynamic from "next/dynamic";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
 import StatsCard from "./cards/StatsCard";
 
-// Fix for default markers
-delete (L.Icon.Default.prototype as { _getIconUrl?: () => string })._getIconUrl;
-L.Icon.Default.mergeOptions({
-	iconRetinaUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
-	iconUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-	shadowUrl:
-		"https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+// Dynamically import the map component with no SSR
+const MapComponent = dynamic(() => import("./DynamicMap"), {
+	ssr: false,
+	loading: () => <PlaceholderMap />,
 });
-
-const size = 34;
-
-function iconHTML(color: string, svg: string) {
-	return `<div style="width:${size}px;height:${size}px;background:${color};border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 2px rgba(0,0,0,.5);">
-            ${svg}
-          </div>`;
-}
-
-const typeConfig: Record<string, { color: string; svg: string }> = {
-	supermarket: {
-		color: "#3b82f6",
-		svg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`,
-	},
-	convenience: {
-		color: "#f59e0b",
-		svg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>`,
-	},
-	grocery: {
-		color: "#22c55e",
-		svg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/><path d="M10 2c1 .5 2 2 2 5"/></svg>`,
-	},
-	organic: {
-		color: "#14b8a6",
-		svg: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>`,
-	},
-};
-
-function getMarkerIcon(type: string) {
-	const config = typeConfig[type] || typeConfig.supermarket;
-	return L.divIcon({
-		html: iconHTML(config.color, config.svg),
-		className: "custom-marker-icon",
-		iconSize: [size, size],
-		iconAnchor: [size / 2, size / 2],
-	});
-}
 
 export default function StoreMap({
 	stores,
@@ -64,12 +21,6 @@ export default function StoreMap({
 	location?: [number, number];
 	radius?: number;
 }) {
-	const mapRef = useRef<L.Map | null>(null);
-	const containerRef = useRef<HTMLDivElement>(null);
-	const markersRef = useRef<L.Marker[]>([]);
-	const circleRef = useRef<L.Circle | null>(null);
-	const [isMapReady, setIsMapReady] = useState(false);
-
 	// Calculate center
 	const center = useMemo(() => {
 		if (location && location.length === 2) {
@@ -78,142 +29,18 @@ export default function StoreMap({
 		return PARIS_COORDINATES as [number, number];
 	}, [location]);
 
-	// Initialize map once
-	useEffect(() => {
-		if (!containerRef.current || mapRef.current) return;
-
-		// Create map instance manually
-		const map = L.map(containerRef.current, {
-			center: PARIS_COORDINATES as [number, number],
-			zoom: 13,
-			scrollWheelZoom: true,
-			attributionControl: true,
-			zoomControl: true,
-		});
-
-		// Add tile layer
-		L.tileLayer("https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
-			attribution: `&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
-		}).addTo(map);
-
-		mapRef.current = map;
-		setIsMapReady(true);
-
-		return () => {
-			if (mapRef.current) {
-				try {
-					mapRef.current.remove();
-				} catch (e) {
-					console.warn("Error removing map:", e);
-				}
-				mapRef.current = null;
-			}
-		};
-	}, []);
-
-	// Update map view when location changes
-	useEffect(() => {
-		if (!mapRef.current || !isMapReady) return;
-
-		mapRef.current.setView(center, mapRef.current.getZoom(), { animate: true });
-	}, [center, isMapReady]);
-
-	// Update circle when location or radius changes
-	useEffect(() => {
-		if (!mapRef.current || !isMapReady) return;
-
-		// Remove existing circle
-		if (circleRef.current) {
-			mapRef.current.removeLayer(circleRef.current);
-		}
-
-		// Add new circle
-		const circle = L.circle(center, {
-			radius,
-			color: "#3388ff",
-			fillColor: "#3388ff",
-			fillOpacity: 0.2,
-		}).addTo(mapRef.current);
-
-		circle.bindPopup(`
-            <div class="text-sm">
-                <p class="font-medium mb-1">${radius / 1000} km Radius</p>
-                <p class="text-xs text-muted-foreground">
-                    Showing stores within ${radius / 1000} km of your location
-                </p>
-            </div>
-        `);
-
-		circleRef.current = circle;
-	}, [center, radius, isMapReady]);
-
-	// Update markers when stores change
-	useEffect(() => {
-		if (!mapRef.current || !isMapReady) return;
-
-		// Clear existing markers
-		markersRef.current.forEach((marker) => {
-			mapRef.current!.removeLayer(marker);
-		});
-		markersRef.current = [];
-
-		// Add new markers
-		if (stores && stores.length > 0) {
-			const newMarkers = stores.map((store) => {
-				const marker = L.marker(
-					[store.location.coordinates[1], store.location.coordinates[0]],
-					{
-						icon: getMarkerIcon(
-							store?.types && store.types.length > 0
-								? store.types[0]
-								: "supermarket"
-						),
-					}
-				).addTo(mapRef.current!);
-
-				// Add popup
-				const popupContent = `
-                    <div class="text-sm" style="min-width: 200px;">
-                        <p class="font-medium mb-1">${store.name}</p>
-                        ${
-													store.flavors
-														? `<p class="mb-1">Flavors: ${store.flavors.join(
-																", "
-														  )}</p>`
-														: ""
-												}
-                        ${
-													store.distance
-														? `<p class="text-xs text-muted-foreground">À ${(
-																store.distance / 1000
-														  ).toFixed(2)} km</p>`
-														: ""
-												}
-                    </div>
-                `;
-				marker.bindPopup(popupContent);
-
-				return marker;
-			});
-
-			markersRef.current = newMarkers;
-
-			// Fit bounds to show all markers
-			if (newMarkers.length > 0) {
-				const group = new L.FeatureGroup(newMarkers);
-				mapRef.current.fitBounds(group.getBounds(), { padding: [20, 20] });
-			}
-		}
-	}, [stores, isMapReady]);
-
 	return (
 		<div className="relative w-full h-full">
 			<StatsCard stores={stores || []} center={center} radius={radius} />
-			<div
-				ref={containerRef}
-				className="absolute inset-0 z-0 rounded-lg"
-				style={{ height: "100%", width: "100%" }}
-			/>
+			<MapComponent stores={stores} location={location} radius={radius} />
 		</div>
 	);
 }
+
+function PlaceholderMap() {
+	return (
+		<div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900/90 rounded-lg animate-pulse" />
+	);
+}
+
+export { PlaceholderMap };

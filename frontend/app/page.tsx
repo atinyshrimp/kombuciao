@@ -18,6 +18,8 @@ import { FLAVORS, PARIS_COORDINATES } from "@/constants";
 import api from "@/lib/api";
 import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
+import { StoreProvider } from "@/lib/store-context";
+
 const StoreMap = dynamic(() => import("@/components/map"), {
 	loading: () => <PlaceholderMap />,
 	ssr: false,
@@ -138,53 +140,10 @@ export default function HomePage() {
 	}, [currentPage, location, selectedFlavors, onlyAvailable, radius]);
 
 	return (
-		<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
-			{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
-			<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 bg-background max-h-full">
-				<Header
-					search={search}
-					setSearch={setSearch}
-					setLocation={setLocation}
-				/>
-				<Filters
-					radius={radius}
-					setRadius={setRadius}
-					onlyAvailable={onlyAvailable}
-					setOnlyAvailable={setOnlyAvailable}
-					selectedFlavors={selectedFlavors}
-					setSelectedFlavors={setSelectedFlavors}
-				/>
-				<StoreList stores={stores} loading={loading} />
-				<StorePagination
-					currentPage={currentPage}
-					setCurrentPage={setCurrentPage}
-					totalPages={totalPages}
-				/>
-			</aside>
-
-			{/* ───────────────── MAP ───────────────── */}
-			<section className="flex-1 relative h-full md:h-auto">
-				<StoreMap
-					key={`storemap-${location?.[0]}-${location?.[1]}`}
-					stores={stores}
-					radius={radius}
-					location={location}
-				/>
-				{/* Mobile toggle */}
-				<Button
-					variant="secondary"
-					className="md:hidden cursor-pointer absolute top-4 left-4 z-20 shadow-lg"
-					onClick={() => setShowMobileList(true)}>
-					Stores & Filters
-				</Button>
-			</section>
-
-			{/* ───────────────── MOBILE DRAWER ───────────────── */}
-			<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
-				<SheetContent side="bottom" className="p-4 pb-8">
-					<SheetHeader>
-						<div className="w-full h-1.5 rounded-full bg-muted-foreground/40 mx-auto mb-2" />
-					</SheetHeader>
+		<StoreProvider>
+			<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
+				{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
+				<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 bg-background max-h-full">
 					<Header
 						search={search}
 						setSearch={setSearch}
@@ -198,17 +157,62 @@ export default function HomePage() {
 						selectedFlavors={selectedFlavors}
 						setSelectedFlavors={setSelectedFlavors}
 					/>
-					<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
-						<StoreList stores={stores} loading={loading} />
-						<StorePagination
-							currentPage={currentPage}
-							setCurrentPage={setCurrentPage}
-							totalPages={totalPages}
+					<StoreList stores={stores} loading={loading} />
+					<StorePagination
+						currentPage={currentPage}
+						setCurrentPage={setCurrentPage}
+						totalPages={totalPages}
+					/>
+				</aside>
+
+				{/* ───────────────── MAP ───────────────── */}
+				<section className="flex-1 relative h-full md:h-auto">
+					<StoreMap
+						key={`storemap-${location?.[0]}-${location?.[1]}`}
+						stores={stores}
+						radius={radius}
+						location={location}
+					/>
+					{/* Mobile toggle */}
+					<Button
+						variant="secondary"
+						className="md:hidden cursor-pointer absolute top-4 left-4 z-20 shadow-lg"
+						onClick={() => setShowMobileList(true)}>
+						Stores & Filters
+					</Button>
+				</section>
+
+				{/* ───────────────── MOBILE DRAWER ───────────────── */}
+				<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
+					<SheetContent side="bottom" className="p-4 pb-8">
+						<SheetHeader>
+							<div className="w-full h-1.5 rounded-full bg-muted-foreground/40 mx-auto mb-2" />
+						</SheetHeader>
+						<Header
+							search={search}
+							setSearch={setSearch}
+							setLocation={setLocation}
 						/>
-					</div>
-				</SheetContent>
-			</Sheet>
-		</div>
+						<Filters
+							radius={radius}
+							setRadius={setRadius}
+							onlyAvailable={onlyAvailable}
+							setOnlyAvailable={setOnlyAvailable}
+							selectedFlavors={selectedFlavors}
+							setSelectedFlavors={setSelectedFlavors}
+						/>
+						<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
+							<StoreList stores={stores} loading={loading} />
+							<StorePagination
+								currentPage={currentPage}
+								setCurrentPage={setCurrentPage}
+								totalPages={totalPages}
+							/>
+						</div>
+					</SheetContent>
+				</Sheet>
+			</div>
+		</StoreProvider>
 	);
 }
 
