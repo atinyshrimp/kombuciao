@@ -16,7 +16,7 @@ import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
 import { FLAVORS, PARIS_COORDINATES } from "@/constants";
 import api from "@/lib/api";
-import type { Store } from "@/types/store";
+import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
 const StoreMap = dynamic(() => import("@/components/map"), {
 	loading: () => <PlaceholderMap />,
@@ -263,7 +263,7 @@ function Header({
 		} else setResults([]); // Clear results if search is empty
 	}, [search]);
 
-	function handleResultClick(result: any) {
+	function handleResultClick(result: SearchResult) {
 		const location = result.geometry.coordinates;
 		console.log("Selected location:", result.properties.name, location);
 		setLocation([location[1], location[0]] as [number, number]); // Set location in [lat, lng] format
@@ -287,18 +287,12 @@ function Header({
 			</div>
 			{results.length > 0 && (
 				<div className="absolute z-50 w-full top-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-					{results.map((result: any, index) => (
+					{results.map((result: SearchResult, index) => (
 						<div
 							key={result.properties.osm_id || index}
 							className="flex flex-col px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground border-b border-border last:border-b-0"
-							onClick={() => handleResultClick(result)}
-						>
-							<p>{result.properties.name}</p>
-							<p className="text-xs text-muted-foreground">
-								{`${result.properties.postcode} ${
-									result.properties.city || ""
-								}`}
-							</p>
+							onClick={() => handleResultClick(result)}>
+							<SearchResult result={result} />
 						</div>
 					))}
 				</div>
@@ -306,6 +300,21 @@ function Header({
 		</div>
 	);
 }
+
+const SearchResult = ({ result }: { result: SearchResult }) => {
+	let mainText = result.properties.name;
+	const subText = `${result.properties.postcode} ${result.properties.city}`;
+	if (result.properties.housenumber) {
+		mainText = `${result.properties.housenumber} ${result.properties.street}`;
+	}
+
+	return (
+		<div className="flex flex-col">
+			<p className="font-medium">{mainText}</p>
+			<p className="text-xs text-muted-foreground">{subText}</p>
+		</div>
+	);
+};
 
 interface FiltersProps {
 	radius: number;

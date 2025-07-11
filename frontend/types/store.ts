@@ -25,3 +25,17 @@ export interface Store {
 	types?: [string];
 	__v: number;
 }
+
+export interface SearchResult {
+	geometry: {
+		coordinates: [number, number];
+	};
+	properties: {
+		name: string;
+		postcode: string;
+		city: string;
+		osm_id: number;
+		housenumber: string;
+		street: string;
+	};
+}
