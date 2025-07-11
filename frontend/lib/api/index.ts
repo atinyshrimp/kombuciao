@@ -5,7 +5,7 @@ import { apiURL } from "../config";
 interface ApiResponse {
 	ok: boolean;
 	error?: string;
-	data?: any;
+	data?: unknown;
 	total?: number;
 }
 
@@ -33,7 +33,7 @@ class api {
 		});
 	}
 
-	put(path: string, body: Object): Promise<ApiResponse> {
+	put(path: string, body: object): Promise<ApiResponse> {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const response = await fetch(`${apiURL}${path}`, {
@@ -75,7 +75,7 @@ class api {
 		});
 	}
 
-	post(path: string, body: Object): Promise<ApiResponse> {
+	post(path: string, body: object): Promise<ApiResponse> {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const response = await fetch(`${apiURL}${path}`, {
