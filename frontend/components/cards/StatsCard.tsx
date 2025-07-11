@@ -62,7 +62,7 @@ const StatsCard = ({
 			onOpenChange={setOpen}>
 			<CollapsibleTrigger className="w-full flex justify-between items-center text-sm font-medium text-gray-900 cursor-pointer">
 				<div>
-					Area Statistics{" "}
+					Statistiques de la zone{" "}
 					<span className="text-xs text-gray-500">({radius / 1000} km)</span>
 				</div>
 				{open ? (
@@ -73,19 +73,21 @@ const StatsCard = ({
 			</CollapsibleTrigger>
 			<CollapsibleContent className="mt-2 space-y-1">
 				<div className="flex justify-between items-center">
-					<span className="text-xs text-gray-600">Total Stores:</span>
+					<span className="text-xs text-gray-600">Magasins totaux :</span>
 					<span className="text-sm font-medium text-gray-900">
 						{stats.total}
 					</span>
 				</div>
 				<div className="flex justify-between items-center">
-					<span className="text-xs text-gray-600">With Kombucha:</span>
+					<span className="text-xs text-gray-600">
+						Magasins avec le précieux :
+					</span>
 					<span className="text-sm font-medium text-green-600">
 						{stats.withKombucha}
 					</span>
 				</div>
 				<div className="flex justify-between items-center">
-					<span className="text-xs text-gray-600">Success Rate:</span>
+					<span className="text-xs text-gray-600">Prospérité de la zone :</span>
 					<span className="text-sm font-medium text-blue-600">
 						{stats.total > 0
 							? Math.round((stats.withKombucha / stats.total) * 100)
