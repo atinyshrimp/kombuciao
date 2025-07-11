@@ -101,12 +101,12 @@ export default function HomePage() {
 		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
 		// setCurrentPage(1); // Reset to first page on filter change
-	}, [radius, onlyAvailable, selectedFlavors, location]);
+	}, [currentPage, radius, onlyAvailable, selectedFlavors, location]);
 
 	async function fetchStores() {
 		setLoading(true);
 		try {
-			let queryParams = new URLSearchParams();
+			const queryParams = new URLSearchParams();
 			queryParams.append("page", currentPage.toString());
 			if (selectedFlavors)
 				for (const flavor of selectedFlavors) {
@@ -174,8 +174,7 @@ export default function HomePage() {
 				<Button
 					variant="secondary"
 					className="md:hidden cursor-pointer absolute top-4 left-4 z-20 shadow-lg"
-					onClick={() => setShowMobileList(true)}
-				>
+					onClick={() => setShowMobileList(true)}>
 					Stores & Filters
 				</Button>
 			</section>
@@ -236,7 +235,7 @@ function Header({
 			const response = await fetch(
 				`https://photon.komoot.io/api?q=${encodeURIComponent(
 					query
-				)}&lang=fr&limit=5&location_bias_scale=0.5`,
+				)}&lang=fr&limit=5`,
 				{
 					mode: "cors",
 					method: "GET",
