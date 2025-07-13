@@ -40,3 +40,20 @@ export interface SearchResult {
 		street: string;
 	};
 }
+
+export interface Vote {
+	_id: string;
+	voterId: string;
+	type: "confirm" | "deny";
+	createdAt: string;
+}
+
+export interface Report {
+	_id: string;
+	store: string;
+	flavors: Flavor[];
+	description: string;
+	votes: Vote[];
+	createdAt: string;
+	updatedAt: string;
+}
