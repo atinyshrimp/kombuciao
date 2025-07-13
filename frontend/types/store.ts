@@ -19,6 +19,7 @@ export interface Store {
 		coordinates: [number, number]; // [longitude, latitude]
 	};
 	flavors: Flavor[];
+	openingHours?: string; // e.g., "Mon-Fri 9-18"
 	createdAt: string;
 	updatedAt: string;
 	distance?: number; // Distance in meters, optional for search results
