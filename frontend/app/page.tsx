@@ -19,6 +19,7 @@ import api from "@/lib/api";
 import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
 import { StoreProvider } from "@/lib/store-context";
+import StoreDetailSheet from "@/components/StoreDetailSheet";
 
 const StoreMap = dynamic(() => import("@/components/map"), {
 	loading: () => <PlaceholderMap />,
@@ -212,6 +213,8 @@ export default function HomePage() {
 					</SheetContent>
 				</Sheet>
 			</div>
+
+			<StoreDetailSheet />
 		</StoreProvider>
 	);
 }
