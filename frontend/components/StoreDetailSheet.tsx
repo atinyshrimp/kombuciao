@@ -17,8 +17,8 @@ import { FLAVORS } from "@/constants";
 import { useStoreContext } from "@/lib/store-context";
 import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
 import api from "@/lib/api";
-import { cn } from "@/lib/utils";
-import { cn, getDateString } from "@/lib/utils";
+import { cn, getDateString, getUserId } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function StoreDetailSheet() {
 	const { selectedStore, setSelectedStore } = useStoreContext();
@@ -239,6 +239,35 @@ const VoteButtons = ({
 	report: Report;
 	fetchReports: () => void;
 }) => {
+	const userId = getUserId();
+	const userVote = report.votes.find((v) => v.voterId === userId);
+	const isConfirmed = userVote?.type === "confirm";
+	const isDenied = userVote?.type === "deny";
+
+	async function handleVote(type: "confirm" | "deny") {
+		const isActionConfirmed = window.confirm(
+			`Voulez-vous vraiment ${
+				type === "confirm" ? "confirmer" : "contester"
+			} le signalement pour ${report.store.name} ?`
+		);
+		if (!isActionConfirmed) return;
+
+		try {
+			const { ok, error } = await api.post(`/reports/${report._id}/${type}`, {
+				voterId: userId,
+			});
+			if (!ok) throw new Error(error);
+			fetchReports();
+			toast.success(
+				`Vote de ${
+					type === "confirm" ? "confirmation" : "contestation"
+				} enregistré avec succès pour ${report.store.name}`
+			);
+		} catch (error) {
+			console.error("Error voting:", error);
+			toast.error("Erreur lors de l'enregistrement du vote");
+		}
+	}
 
 	return (
 		<div className="flex gap-1">
@@ -251,6 +280,7 @@ const VoteButtons = ({
 					userVote && "pointer-events-none"
 				)}
 				aria-label="Confirmer"
+				onClick={() => handleVote("confirm")}>
 				{isConfirmed ? (
 					<TbArrowBigUpFilled size={16} aria-hidden="true" />
 				) : (
@@ -269,6 +299,7 @@ const VoteButtons = ({
 					userVote && "pointer-events-none"
 				)}
 				aria-label="Contester"
+				onClick={() => handleVote("deny")}>
 				{isDenied ? (
 					<TbArrowBigDownFilled size={16} aria-hidden="true" />
 				) : (

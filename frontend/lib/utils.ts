@@ -17,6 +17,17 @@ export function getAllowedTypes(types: string[] | undefined): string {
 	// Fallback to default type if no valid types found
 	return "supermarket";
 }
+
+export function getUserId() {
+	const userIdKey = "kombuciao-user-id";
+	let userId = localStorage.getItem(userIdKey);
+	if (!userId) {
+		userId = crypto.randomUUID();
+		localStorage.setItem(userIdKey, userId);
+	}
+	return userId;
+}
+
 export function getDateString(date: Date) {
 	return `${date.toLocaleDateString("fr-FR", {
 		day: "numeric",

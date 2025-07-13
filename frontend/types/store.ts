@@ -50,7 +50,7 @@ export interface Vote {
 
 export interface Report {
 	_id: string;
-	store: string;
+	store: Store;
 	flavors: Flavor[];
 	description: string;
 	votes: Vote[];
