@@ -76,7 +76,7 @@ export default function DynamicMap({
 	const [isMapReady, setIsMapReady] = useState(false);
 
 	// Get the hovered store from context
-	const { hoveredStore, setHoveredStore } = useStoreContext();
+	const { hoveredStore, setHoveredStore, setSelectedStore } = useStoreContext();
 
 	// Calculate center
 	const center = useMemo(() => {
@@ -257,9 +257,10 @@ export default function DynamicMap({
 				const popup = L.popup().setContent(popupContent);
 				marker.bindPopup(popup);
 
-				// Add hover event handlers
+				// Add hover and click event handlers
 				marker.on("mouseover", () => setHoveredStore(store._id));
 				marker.on("mouseout", () => setHoveredStore(null));
+				marker.on("click", () => setSelectedStore(store._id));
 
 				// Store the marker and popup
 				newMarkers[store._id] = marker;

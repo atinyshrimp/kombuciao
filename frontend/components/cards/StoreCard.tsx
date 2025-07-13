@@ -38,9 +38,8 @@ const StoreCardSkeleton = () => {
 };
 
 const StoreCard = ({ store }: { store: Store }) => {
-	const { hoveredStore, setHoveredStore } = useStoreContext();
+	const { hoveredStore, setHoveredStore, setSelectedStore } = useStoreContext();
 	const isHovered = hoveredStore === store._id;
-
 	return (
 		<Card
 			className={cn(
@@ -48,7 +47,8 @@ const StoreCard = ({ store }: { store: Store }) => {
 				isHovered ? "bg-accent/80" : "hover:bg-accent"
 			)}
 			onMouseEnter={() => setHoveredStore(store._id)}
-			onMouseLeave={() => setHoveredStore(null)}>
+			onMouseLeave={() => setHoveredStore(null)}
+			onClick={() => setSelectedStore(store._id)}>
 			<CardContent className="p-0 flex flex-1 gap-4">
 				<div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
 					<StoreIcon type={getAllowedTypes(store.types)} />
