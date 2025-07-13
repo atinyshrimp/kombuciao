@@ -17,3 +17,13 @@ export function getAllowedTypes(types: string[] | undefined): string {
 	// Fallback to default type if no valid types found
 	return "supermarket";
 }
+export function getDateString(date: Date) {
+	return `${date.toLocaleDateString("fr-FR", {
+		day: "numeric",
+		month: "short",
+		year: "numeric",
+	})} à ${date.toLocaleTimeString("fr-FR", {
+		hour: "2-digit",
+		minute: "2-digit",
+	})}`;
+}

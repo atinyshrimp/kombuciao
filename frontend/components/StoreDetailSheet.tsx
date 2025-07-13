@@ -18,6 +18,7 @@ import { useStoreContext } from "@/lib/store-context";
 import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
 import api from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { cn, getDateString } from "@/lib/utils";
 
 export default function StoreDetailSheet() {
 	const { selectedStore, setSelectedStore } = useStoreContext();
@@ -322,6 +323,17 @@ const ReportCard = ({
 				</p>
 			)}
 
+			<div className="flex items-end justify-between">
+				<div className="flex flex-col items-start">
+					<span className="text-xs text-gray-500">
+						Signalé le {getDateString(new Date(report.createdAt))}
+					</span>
+					<span className="text-xs text-gray-500">
+						Dernier vote le {getDateString(new Date(report.updatedAt))}
+					</span>
+				</div>
+				<VoteButtons report={report} fetchReports={fetchReports} />
+			</div>
 		</div>
 	);
 };
