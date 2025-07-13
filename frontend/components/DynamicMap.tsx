@@ -100,8 +100,8 @@ export default function DynamicMap({
 		});
 
 		// Add tile layer
-		L.tileLayer("https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png", {
-			attribution: `&copy; OpenStreetMap France | &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`,
+		L.tileLayer("https://mt0.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=fr", {
+			attribution: "Map data &copy;2025 Google",
 		}).addTo(map);
 
 		mapRef.current = map;
