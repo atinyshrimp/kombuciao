@@ -17,6 +17,7 @@ import { FLAVORS } from "@/constants";
 import { useStoreContext } from "@/lib/store-context";
 import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
 import api from "@/lib/api";
+import { cn } from "@/lib/utils";
 
 export default function StoreDetailSheet() {
 	const { selectedStore, setSelectedStore } = useStoreContext();
@@ -214,81 +215,11 @@ export default function StoreDetailSheet() {
 							) : (
 								<div className="space-y-3">
 									{reports.map((report) => (
-										<div
+										<ReportCard
 											key={report._id}
-											className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
-											<div className="flex items-start justify-between mb-3">
-												<div className="flex flex-wrap gap-1.5">
-													{report.flavors.map((flavor) => {
-														const label =
-															FLAVORS[flavor as keyof typeof FLAVORS];
-														if (!label) return null;
-														const icon = label.split(" ")[0];
-														return (
-															<span
-																key={flavor}
-																className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
-																title={label}>
-																{icon}
-															</span>
-														);
-													})}
-												</div>
-												<div className="flex items-center gap-3 text-xs text-gray-500">
-													<div className="flex items-center gap-1">
-														<Users className="h-3 w-3" />
-														<span>{report.votes.length}</span>
-													</div>
-												</div>
-											</div>
-
-											{report.description && (
-												<p className="text-sm text-gray-600 mb-3 leading-relaxed">
-													{report.description}
-												</p>
-											)}
-
-											<div className="flex items-end justify-between">
-												<span className="text-xs text-gray-500">
-													{new Date(report.createdAt).toLocaleDateString(
-														"fr-FR",
-														{
-															day: "numeric",
-															month: "short",
-															year: "numeric",
-														}
-													)}
-												</span>
-												<div className="flex gap-1">
-													<Button
-														variant="outline"
-														size="sm"
-														className="h-8 px-2 flex items-center gap-1 text-green-600 cursor-pointer hover:text-green-700 hover:bg-green-50"
-														aria-label="Confirmer">
-														<TbArrowBigUp size={16} aria-hidden="true" />
-														<span className="text-xs font-medium">
-															{
-																report.votes.filter((v) => v.type === "confirm")
-																	.length
-															}
-														</span>
-													</Button>
-													<Button
-														variant="outline"
-														size="sm"
-														className="h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer hover:text-red-700 hover:bg-red-50"
-														aria-label="Contester">
-														<TbArrowBigDown size={16} aria-hidden="true" />
-														<span className="text-xs font-medium">
-															{
-																report.votes.filter((v) => v.type === "deny")
-																	.length
-															}
-														</span>
-													</Button>
-												</div>
-											</div>
-										</div>
+											report={report}
+											fetchReports={fetchReports}
+										/>
 									))}
 								</div>
 							)}
@@ -299,3 +230,98 @@ export default function StoreDetailSheet() {
 		</Sheet>
 	);
 }
+
+const VoteButtons = ({
+	report,
+	fetchReports,
+}: {
+	report: Report;
+	fetchReports: () => void;
+}) => {
+
+	return (
+		<div className="flex gap-1">
+			<Button
+				variant="outline"
+				size="sm"
+				className={cn(
+					"h-8 px-2 flex items-center gap-1 text-green-600 cursor-pointer hover:text-green-700 hover:bg-green-50",
+					isConfirmed && "text-green-600 bg-green-50",
+					userVote && "pointer-events-none"
+				)}
+				aria-label="Confirmer"
+				{isConfirmed ? (
+					<TbArrowBigUpFilled size={16} aria-hidden="true" />
+				) : (
+					<TbArrowBigUp size={16} aria-hidden="true" />
+				)}
+				<span className="text-xs font-medium">
+					{report.votes.filter((v) => v.type === "confirm").length}
+				</span>
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				className={cn(
+					"h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer hover:text-red-700 hover:bg-red-50",
+					isDenied && "text-red-600 bg-red-50",
+					userVote && "pointer-events-none"
+				)}
+				aria-label="Contester"
+				{isDenied ? (
+					<TbArrowBigDownFilled size={16} aria-hidden="true" />
+				) : (
+					<TbArrowBigDown size={16} aria-hidden="true" />
+				)}
+				<span className="text-xs font-medium">
+					{report.votes.filter((v) => v.type === "deny").length}
+				</span>
+			</Button>
+		</div>
+	);
+};
+
+const ReportCard = ({
+	report,
+	fetchReports,
+}: {
+	report: Report;
+	fetchReports: () => void;
+}) => {
+	return (
+		<div
+			key={report._id}
+			className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+			<div className="flex items-start justify-between mb-3">
+				<div className="flex flex-wrap gap-1.5">
+					{report.flavors.map((flavor) => {
+						const label = FLAVORS[flavor as keyof typeof FLAVORS];
+						if (!label) return null;
+						const icon = label.split(" ")[0];
+						return (
+							<span
+								key={flavor}
+								className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+								title={label}>
+								{icon}
+							</span>
+						);
+					})}
+				</div>
+				<div className="flex items-center gap-3 text-xs text-gray-500">
+					<div className="flex items-center gap-1">
+						<Users className="h-3 w-3" />
+						<span>{report.votes.length}</span>
+					</div>
+				</div>
+			</div>
+
+			{report.description && (
+				<p className="text-sm text-gray-600 mb-3 leading-relaxed">
+					{report.description}
+				</p>
+			)}
+
+		</div>
+	);
+};
