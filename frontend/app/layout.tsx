@@ -24,10 +24,9 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
+		<html lang="fr">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
+				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
 				<div className="flex flex-col items-center justify-items-center p-8 pb-20 gap-16 font-[family-name:var(--font-geist-sans)]">
 					<main className="h-[93dvh] w-full flex flex-col gap-[32px] max-w-7xl mx-auto row-start-2 items-center sm:items-start">
 						{children}
@@ -37,8 +36,7 @@ export default function RootLayout({
 							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
 							href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
 							target="_blank"
-							rel="noopener noreferrer"
-						>
+							rel="noopener noreferrer">
 							<Image
 								aria-hidden
 								src="/file.svg"
@@ -52,8 +50,7 @@ export default function RootLayout({
 							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
 							href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
 							target="_blank"
-							rel="noopener noreferrer"
-						>
+							rel="noopener noreferrer">
 							<Image
 								aria-hidden
 								src="/window.svg"
@@ -67,8 +64,7 @@ export default function RootLayout({
 							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
 							href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
 							target="_blank"
-							rel="noopener noreferrer"
-						>
+							rel="noopener noreferrer">
 							<Image
 								aria-hidden
 								src="/globe.svg"
