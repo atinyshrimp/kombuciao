@@ -50,7 +50,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 			onMouseLeave={() => setHoveredStore(null)}
 			onClick={() => setSelectedStore(store._id)}>
 			<CardContent className="p-0 flex flex-1 gap-4">
-				<div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold">
+				<div className="w-9 h-9 rounded-full flex-shrink-0 bg-muted flex items-center justify-center text-xs font-bold">
 					<StoreIcon type={getAllowedTypes(store.types)} />
 				</div>
 				<div
