@@ -53,12 +53,8 @@ export default function StoreDetailSheet() {
 			const { ok, data, error } = await api.get(
 				`/reports?storeId=${selectedStore}`
 			);
-			if (ok) {
-				setReports(data as Report[]);
-			} else {
-				console.error("Error fetching reports:", error);
-				setReports([]);
-			}
+			if (!ok) throw new Error(error);
+			setReports(data as Report[]);
 		} catch (error) {
 			console.error("Error fetching reports:", error);
 			setReports([]);
