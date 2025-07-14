@@ -3,10 +3,11 @@
 import { useRef, useEffect, useState, useMemo } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { PARIS_COORDINATES } from "@/constants";
+import { PARIS_COORDINATES, TYPES } from "@/constants";
 import { Store } from "@/types/store";
 import { useStoreContext } from "@/lib/store-context";
 import { formatNumber } from "@/lib/utils";
+import { getOpeningStatus } from "@/lib/opening-hours";
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as { _getIconUrl?: () => string })._getIconUrl;
@@ -234,27 +235,77 @@ export default function DynamicMap({
 					}
 				).addTo(mapRef.current!);
 
-				// Create popup content
+				// Create enhanced popup content with better UX
+				const openingStatus = store.openingHours
+					? getOpeningStatus(store.openingHours)
+					: null;
+
 				const popupContent = `
-                    <div class="text-sm" style="min-width: 200px;">
-                        <p class="font-medium mb-1">${store.name}</p>
-                        ${
-													store.flavors
-														? `<p class="mb-1">Flavors: ${store.flavors.join(
-																", "
-														  )}</p>`
-														: ""
-												}
-                        ${
-													store.distance
-														? `<p class="text-xs text-muted-foreground">À ${formatNumber(
-																store.distance / 1000,
-																2
-														  )} km</p>`
-														: ""
-												}
-                    </div>
-                `;
+					<div class="store-popup">
+						<div class="store-popup-header">
+							<h3 class="store-popup-title">${store.name}</h3>
+							<div class="store-popup-meta">
+								${
+									store.types && store.types.length > 0
+										? `<span class="store-popup-type">${
+												TYPES[store.types[0] as keyof typeof TYPES]
+										  }</span>`
+										: ""
+								}
+								${
+									store.distance
+										? `<div class="store-popup-distance">
+										<svg class="store-popup-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+										</svg>
+										${formatNumber(store.distance / 1000, 2)} km
+									</div>`
+										: ""
+								}
+							</div>
+						</div>
+						
+						<div class="store-popup-content">
+							<!-- Quick Info Grid -->
+							<div class="store-popup-quick-info">
+								${
+									openingStatus
+										? `
+									<div class="store-popup-quick-info-item">
+										<div class="store-popup-status-dot ${
+											openingStatus.isOpen ? "bg-green-500" : "bg-red-500"
+										}"></div>
+										<span class="store-popup-quick-info-text ${
+											openingStatus.isOpen
+												? "text-green-600 dark:text-green-400"
+												: "text-red-600 dark:text-red-400"
+										}">${openingStatus.isOpen ? "Ouvert" : "Fermé"}</span>
+									</div>
+								`
+										: ""
+								}
+							</div>
+
+							<!-- Address -->
+							<div class="store-popup-section">
+								<svg class="store-popup-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+								</svg>
+								<div class="store-popup-address">
+									<div class="store-popup-address-street">${
+										store.address.street || "Adresse non disponible"
+									}</div>
+									<div class="store-popup-address-city">${store.address.postCode || ""} ${
+					store.address.city || ""
+				}</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				`;
 
 				const popup = L.popup().setContent(popupContent);
 				marker.bindPopup(popup);
@@ -280,6 +331,22 @@ export default function DynamicMap({
 			}
 		}
 	}, [stores, isMapReady, setHoveredStore]);
+
+	// Add event listener for store selection from popup
+	useEffect(() => {
+		const handleSelectStore = (event: CustomEvent) => {
+			setSelectedStore(event.detail);
+		};
+
+		window.addEventListener("selectStore", handleSelectStore as EventListener);
+
+		return () => {
+			window.removeEventListener(
+				"selectStore",
+				handleSelectStore as EventListener
+			);
+		};
+	}, [setSelectedStore]);
 
 	return (
 		<div
