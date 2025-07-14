@@ -4,7 +4,7 @@ const Store = require("../models/store.js");
 
 async function createReport(req, res, next) {
 	try {
-		const { storeId, flavors, description } = req.body;
+		const { storeId, flavors, description, voterId } = req.body;
 		if (!storeId || !flavors || !Array.isArray(flavors) || flavors.length === 0)
 			return res
 				.status(400)
@@ -18,6 +18,7 @@ async function createReport(req, res, next) {
 			store: storeId,
 			flavors,
 			description,
+			votes: [{ voterId, type: "confirm" }],
 		});
 		res.status(201).json({ ok: true, data: report });
 	} catch (e) {

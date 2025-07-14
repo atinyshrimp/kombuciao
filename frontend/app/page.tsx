@@ -11,7 +11,7 @@ import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
-import MultipleSelector, { Option } from "@/components/ui/multiselect";
+import { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
 import { FLAVORS, PARIS_COORDINATES } from "@/constants";
@@ -20,6 +20,7 @@ import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
 import { StoreProvider } from "@/lib/store-context";
 import StoreDetailSheet from "@/components/StoreDetailSheet";
+import FlavorSelector from "@/components/features/FlavorSelector";
 
 const StoreMap = dynamic(() => import("@/components/map"), {
 	loading: () => <PlaceholderMap />,
@@ -136,6 +137,7 @@ export default function HomePage() {
 			setLoading(false);
 		}
 	}
+
 	useEffect(() => {
 		fetchStores();
 	}, [currentPage, location, selectedFlavors, onlyAvailable, radius]);
@@ -214,7 +216,7 @@ export default function HomePage() {
 				</Sheet>
 			</div>
 
-			<StoreDetailSheet />
+			<StoreDetailSheet fetchStores={fetchStores} />
 		</StoreProvider>
 	);
 }
@@ -372,19 +374,10 @@ function Filters({
 
 			<div>
 				<label className="text-sm font-medium">Saveurs</label>
-				<div className="flex flex-wrap gap-2 mt-2">
-					<MultipleSelector
-						options={Object.entries(FLAVORS).map(([key, label]) => ({
-							value: key,
-							label,
-						}))}
-						value={selectedFlavors}
-						onChange={setSelectedFlavors}
-						placeholder="Sélectionner des saveurs"
-						className="w-full"
-						hidePlaceholderWhenSelected
-					/>
-				</div>
+				<FlavorSelector
+					selectedFlavors={selectedFlavors}
+					setSelectedFlavors={setSelectedFlavors}
+				/>
 			</div>
 		</Card>
 	);

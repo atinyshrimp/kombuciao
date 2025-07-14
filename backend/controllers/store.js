@@ -193,13 +193,11 @@ async function deleteStore(req, res, next) {
 
 async function getStats(req, res, next) {
 	try {
-		const { lat, lng, radius = 5000, sinceDays = 7 } = req.query;
+		const { lat, lng, radius = 5000 } = req.query;
 		if ((!lat || !lng) && radius)
 			return res
 				.status(400)
 				.json({ ok: false, error: "Radius requires lat and lng" });
-
-		const sinceDate = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000);
 
 		const stages = [];
 		if (lat && lng) {
@@ -229,10 +227,7 @@ async function getStats(req, res, next) {
 							{
 								$match: {
 									$expr: {
-										$and: [
-											{ $eq: ["$store", "$$storeId"] },
-											{ $gte: ["$createdAt", sinceDate] },
-										],
+										$and: [{ $eq: ["$store", "$$storeId"] }],
 									},
 								},
 							},
