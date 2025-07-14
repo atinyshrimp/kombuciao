@@ -63,9 +63,53 @@ export default function StoreDetailSheet() {
 		}
 	};
 
-	const isOpen = Boolean(selectedStore && store);
+	const isOpen = Boolean(selectedStore);
 
-	if (!store) return null;
+	if (!selectedStore) return null;
+
+	// Show loading state while store data is being fetched
+	if (!store) {
+		return (
+			<Sheet open={isOpen} onOpenChange={() => setSelectedStore(null)}>
+				<SheetContent
+					side="right"
+					className="w-full sm:max-w-lg p-0 overflow-hidden">
+					{/* Loading Header */}
+					<div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 text-white p-6 pb-8">
+						<div className="absolute inset-0 bg-black/10" />
+						<div className="relative">
+							<div className="flex items-start justify-between mb-4">
+								<div className="flex-1 min-w-0">
+									<SheetTitle className="text-white text-xl font-bold mb-2">
+										<Skeleton className="h-6 w-48 bg-white/20" />
+									</SheetTitle>
+									<div className="flex items-center gap-2 text-white/90 text-sm">
+										<MapPin className="h-4 w-4 flex-shrink-0" />
+										<Skeleton className="h-4 w-32 bg-white/20" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Loading Content */}
+					<div className="flex-1 overflow-y-auto">
+						<div className="p-6 space-y-6">
+							{[1, 2, 3].map((i) => (
+								<div key={i} className="space-y-3">
+									<Skeleton className="h-5 w-40" />
+									<div className="bg-gray-50 rounded-lg p-4">
+										<Skeleton className="h-4 w-full mb-2" />
+										<Skeleton className="h-4 w-2/3" />
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+				</SheetContent>
+			</Sheet>
+		);
+	}
 
 	const openingStatus = getOpeningStatus(store.openingHours || "");
 	const parsedHours = parseOpeningHours(store.openingHours || "");
@@ -104,16 +148,18 @@ export default function StoreDetailSheet() {
 								</Badge>
 							)}
 
-							<Badge
-								variant="secondary"
-								className={`border-white/30 ${
-									openingStatus.isOpen
-										? "bg-green-500/20 text-green-100 border-green-300/30"
-										: "bg-red-500/20 text-red-100 border-red-300/30"
-								}`}>
-								<Clock className="h-3 w-3 mr-1" />
-								{openingStatus.isOpen ? "Ouvert" : "Fermé"}
-							</Badge>
+							{store.openingHours && (
+								<Badge
+									variant="secondary"
+									className={`border-white/30 ${
+										openingStatus.isOpen
+											? "bg-green-500/20 text-green-100 border-green-300/30"
+											: "bg-red-500/20 text-red-100 border-red-300/30"
+									}`}>
+									<Clock className="h-3 w-3 mr-1" />
+									{openingStatus.isOpen ? "Ouvert" : "Fermé"}
+								</Badge>
+							)}
 
 							{store.types && store.types.length > 0 && (
 								<Badge
