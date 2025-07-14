@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
 import { SearchIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -21,11 +20,7 @@ import StorePagination from "@/components/features/StorePagination";
 import { StoreProvider } from "@/lib/store-context";
 import StoreDetailSheet from "@/components/StoreDetailSheet";
 import FlavorSelector from "@/components/features/FlavorSelector";
-
-const StoreMap = dynamic(() => import("@/components/map"), {
-	loading: () => <PlaceholderMap />,
-	ssr: false,
-});
+import StoreMap from "@/components/map";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -417,11 +412,5 @@ function StoreList({
 					<StoreCard key={store._id || i} store={store} />
 				))}
 		</div>
-	);
-}
-
-function PlaceholderMap() {
-	return (
-		<div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-gray-900/90 rounded-lg animate-pulse" />
 	);
 }

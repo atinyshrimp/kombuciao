@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import dynamic from "next/dynamic";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
-import StatsCard from "./cards/StatsCard";
+import StatsCard from "../cards/StatsCard";
 
 // Dynamically import the map component with no SSR
 const MapComponent = dynamic(() => import("./DynamicMap"), {
