@@ -24,11 +24,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 	const setSelectedStore = (id: string | null) => {
 		const params = new URLSearchParams(searchParams);
 
-		if (id) {
-			params.set("storeId", id);
-		} else {
-			params.delete("storeId");
-		}
+		if (id) params.set("storeId", id);
+		else params.delete("storeId");
 
 		// Update URL without refreshing the page
 		router.push(`?${params.toString()}`, { scroll: false });
