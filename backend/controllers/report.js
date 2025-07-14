@@ -55,7 +55,7 @@ async function listReports(req, res, next) {
 			.populate("store", "name address location")
 			.skip((page - 1) * pageSize)
 			.limit(Number(pageSize))
-			.sort("-createdAt");
+			.sort("-updatedAt");
 		const total = await Report.countDocuments(criteria);
 		res.status(200).json({
 			ok: true,
