@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/collapsible";
 import API from "@/lib/api";
 import { Store } from "@/types/store";
+import { formatNumber } from "@/lib/utils";
 
 const StatsCard = ({
 	stores,
@@ -63,7 +64,9 @@ const StatsCard = ({
 			<CollapsibleTrigger className="w-full flex justify-between items-center text-sm font-medium text-gray-900 cursor-pointer">
 				<div>
 					Statistiques de la zone{" "}
-					<span className="text-xs text-gray-500">({radius / 1000} km)</span>
+					<span className="text-xs text-gray-500">
+						({formatNumber(radius / 1000)} km)
+					</span>
 				</div>
 				{open ? (
 					<ChevronUpIcon className="text-gray-900 ml-2" size={16} />

@@ -38,3 +38,10 @@ export function getDateString(date: Date) {
 		minute: "2-digit",
 	})}`;
 }
+
+export function formatNumber(number: number, fractionDigits = 1) {
+	return number.toLocaleString("fr-FR", {
+		minimumFractionDigits: fractionDigits,
+		maximumFractionDigits: fractionDigits,
+	});
+}

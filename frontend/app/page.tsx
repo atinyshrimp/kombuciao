@@ -21,6 +21,7 @@ import { StoreProvider } from "@/lib/store-context";
 import StoreDetailSheet from "@/components/features/StoreDetailSheet";
 import FlavorSelector from "@/components/features/FlavorSelector";
 import StoreMap from "@/components/map";
+import { formatNumber } from "@/lib/utils";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -355,7 +356,7 @@ function Filters({
 
 			<div>
 				<label className="text-sm font-medium">
-					Rayon : {currentRadius / 1000} km
+					Rayon : {formatNumber(currentRadius / 1000)} km
 				</label>
 				<Slider
 					min={100}

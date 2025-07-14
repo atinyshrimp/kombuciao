@@ -3,7 +3,7 @@ import { ShoppingCart, Clock, Apple, Leaf } from "lucide-react";
 
 import { Store } from "@/types/store";
 import { Card, CardContent } from "@/components/ui/card";
-import { cn, getAllowedTypes } from "@/lib/utils";
+import { cn, formatNumber, getAllowedTypes } from "@/lib/utils";
 import { FLAVORS } from "@/constants";
 import { Skeleton } from "../ui/skeleton";
 import { useStoreContext } from "@/lib/store-context";
@@ -62,7 +62,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 						{store.name}
 						<span className="text-xs text-muted-foreground font-normal">
 							{" "}
-							• {(store.distance! / 1000).toFixed(1)} km
+							• {formatNumber(store.distance! / 1000)} km
 						</span>
 					</p>
 					{store.address.street && (

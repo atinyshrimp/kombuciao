@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import { PARIS_COORDINATES } from "@/constants";
 import { Store } from "@/types/store";
 import { useStoreContext } from "@/lib/store-context";
+import { formatNumber } from "@/lib/utils";
 
 // Fix for default markers
 delete (L.Icon.Default.prototype as { _getIconUrl?: () => string })._getIconUrl;
@@ -246,9 +247,10 @@ export default function DynamicMap({
 												}
                         ${
 													store.distance
-														? `<p class="text-xs text-muted-foreground">À ${(
-																store.distance / 1000
-														  ).toFixed(2)} km</p>`
+														? `<p class="text-xs text-muted-foreground">À ${formatNumber(
+																store.distance / 1000,
+																2
+														  )} km</p>`
 														: ""
 												}
                     </div>
