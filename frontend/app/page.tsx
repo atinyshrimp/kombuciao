@@ -216,7 +216,7 @@ export default function HomePage() {
 				</Sheet>
 			</div>
 
-			<StoreDetailSheet />
+			<StoreDetailSheet fetchStores={fetchStores} />
 		</StoreProvider>
 	);
 }
