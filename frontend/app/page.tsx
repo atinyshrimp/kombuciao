@@ -104,7 +104,7 @@ export default function HomePage() {
 
 		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
-		// setCurrentPage(1); // Reset to first page on filter change
+		setCurrentPage(1); // Reset to first page on filter change
 	}, [currentPage, radius, onlyAvailable, selectedFlavors, location]);
 
 	async function fetchStores() {
