@@ -7,11 +7,13 @@ export const FLAVORS = {
 	gingembre_hibiscus: "🌺 Gingembre Hibiscus",
 };
 
-export const ALLOWED_TYPES = [
-	"supermarket",
-	"convenience",
-	"organic",
-	"grocery",
-];
+export const TYPES = {
+	supermarket: "🛒 Supermarché",
+	convenience: "🏪 Supérette",
+	organic: "🌿 Bio",
+	grocery: "🍎 Epicerie",
+};
+
+export const ALLOWED_TYPES = Object.keys(TYPES);
 
 export const PARIS_COORDINATES = [2.3522219, 48.856614]; // Paris coordinates for default map view

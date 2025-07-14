@@ -13,7 +13,7 @@ import {
 } from "react-icons/tb";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Store, Report } from "@/types/store";
-import { FLAVORS } from "@/constants";
+import { FLAVORS, TYPES } from "@/constants";
 import { useStoreContext } from "@/lib/store-context";
 import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
 import api from "@/lib/api";
@@ -188,7 +188,7 @@ export default function StoreDetailSheet({
 									<Badge
 										variant="secondary"
 										className="bg-white/20 text-white border-white/30 hover:bg-white/30">
-										{store.types[0]}
+										{TYPES[store.types[0] as keyof typeof TYPES]}
 									</Badge>
 								)}
 							</div>
