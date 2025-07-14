@@ -19,8 +19,8 @@ import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
 import api from "@/lib/api";
 import { cn, getDateString, getUserId } from "@/lib/utils";
 import { toast } from "sonner";
-import FlavorSelector from "./features/FlavorSelector";
-import { Option } from "./ui/multiselect";
+import FlavorSelector from "./FlavorSelector";
+import { Option } from "../ui/multiselect";
 import {
 	Dialog,
 	DialogContent,

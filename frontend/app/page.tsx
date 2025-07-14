@@ -18,7 +18,7 @@ import api from "@/lib/api";
 import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
 import { StoreProvider } from "@/lib/store-context";
-import StoreDetailSheet from "@/components/StoreDetailSheet";
+import StoreDetailSheet from "@/components/features/StoreDetailSheet";
 import FlavorSelector from "@/components/features/FlavorSelector";
 import StoreMap from "@/components/map";
 
