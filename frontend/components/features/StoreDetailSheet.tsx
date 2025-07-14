@@ -304,7 +304,7 @@ export default function StoreDetailSheet({
 					</div>
 				</SheetContent>
 			</Sheet>
-			<ReportModal
+			<CreateReportModal
 				showReportModal={showReportModal}
 				setShowReportModal={setShowReportModal}
 				fetchReports={fetchReports}
@@ -454,7 +454,7 @@ const ReportCard = ({
 	);
 };
 
-const ReportModal = ({
+const CreateReportModal = ({
 	showReportModal,
 	setShowReportModal,
 	setIsEdited,
