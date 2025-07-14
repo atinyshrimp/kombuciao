@@ -100,8 +100,12 @@ export default function HomePage() {
 
 		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
-		setCurrentPage(1); // Reset to first page on filter change
+		fetchStores();
 	}, [currentPage, radius, onlyAvailable, selectedFlavors, location]);
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [radius, onlyAvailable, selectedFlavors, location]);
 
 	async function fetchStores() {
 		setLoading(true);
@@ -133,10 +137,6 @@ export default function HomePage() {
 			setLoading(false);
 		}
 	}
-
-	useEffect(() => {
-		fetchStores();
-	}, [currentPage, location, selectedFlavors, onlyAvailable, radius]);
 
 	return (
 		<StoreProvider>
