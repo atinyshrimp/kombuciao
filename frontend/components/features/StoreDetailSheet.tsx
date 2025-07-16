@@ -1,14 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-	MapPin,
-	Users,
-	MessageSquare,
-	Clock,
-	Plus,
-	Pencil,
-} from "lucide-react";
+import { MapPin, Users, MessageSquare, Clock, Plus } from "lucide-react";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,10 +28,8 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog";
 import { LoaderCircleIcon } from "lucide-react";
-import { Input } from "../ui/input";
 
 export default function StoreDetailSheet({
 	fetchStores,
@@ -51,7 +42,6 @@ export default function StoreDetailSheet({
 	const [loading, setLoading] = useState(false);
 	const [showReportModal, setShowReportModal] = useState(false);
 	const [isEdited, setIsEdited] = useState(false);
-	const [showEditModal, setShowEditModal] = useState(false);
 
 	// Fetch store and reports when store is selected
 	useEffect(() => {
@@ -202,13 +192,6 @@ export default function StoreDetailSheet({
 									</Badge>
 								)}
 							</div>
-
-							<EditStoreModal
-								showEditModal={showEditModal}
-								setShowEditModal={setShowEditModal}
-								store={store}
-								fetchStore={fetchStore}
-							/>
 						</div>
 					</div>
 
@@ -562,128 +545,6 @@ const CreateReportModal = ({
 						Créer le signalement
 					</Button>
 				</DialogFooter>
-			</DialogContent>
-		</Dialog>
-	);
-};
-
-const EditStoreModal = ({
-	showEditModal,
-	setShowEditModal,
-	store,
-	fetchStore,
-}: {
-	showEditModal: boolean;
-	setShowEditModal: (show: boolean) => void;
-	store: Store;
-	fetchStore: () => void;
-}) => {
-	const [loading, setLoading] = useState(false);
-	const [values, setValues] = useState({
-		name: "",
-		address: {
-			street: "",
-			city: "",
-		},
-		openingHours: "",
-	});
-
-	useEffect(() => {
-		if (!store) return;
-		setValues({
-			name: store.name,
-			address: {
-				street: store.address.street,
-				city: store.address.city,
-			},
-			openingHours: store.openingHours || "",
-		});
-	}, [store]);
-
-	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-		e.preventDefault();
-		try {
-			setLoading(true);
-			const { ok, error } = await api.put(`/stores/${store._id}`, values);
-			if (!ok) throw new Error(error);
-			toast.success("Magasin modifié avec succès");
-			setShowEditModal(false);
-			fetchStore();
-		} catch (error) {
-			console.error("Error editing store:", error);
-			toast.error("Erreur lors de la modification du magasin");
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	return (
-		<Dialog open={showEditModal} onOpenChange={setShowEditModal}>
-			<DialogTrigger asChild>
-				<Button
-					variant="ghost"
-					className="cursor-pointer text-xs mt-4 hover:bg-white/5">
-					<Pencil className="h-4 w-4" />
-					Modifier
-				</Button>
-			</DialogTrigger>
-			<DialogContent>
-				<DialogHeader>
-					<DialogTitle>Modifier le magasin</DialogTitle>
-				</DialogHeader>
-				<DialogDescription>
-					Modifier les informations du magasin {store.name}
-				</DialogDescription>
-				<form onSubmit={handleSubmit} className="space-y-4 mt-4">
-					<div className="space-y-2">
-						<label htmlFor="name" className="block text-sm font-medium">
-							Nom du magasin
-						</label>
-						<Input
-							id="name"
-							value={values.name}
-							onChange={(e) => setValues({ ...values, name: e.target.value })}
-						/>
-					</div>
-					<div className="space-y-2">
-						<label htmlFor="address" className="block text-sm font-medium">
-							Adresse
-						</label>
-						<div className="flex items-center gap-2 w-full">
-							<Input
-								id="street"
-								value={values.address.street}
-								placeholder="Nom de la rue"
-								onChange={(e) =>
-									setValues({
-										...values,
-										address: { ...values.address, street: e.target.value },
-									})
-								}
-							/>
-							<Input
-								id="city"
-								value={values.address.city}
-								placeholder="Ville"
-								onChange={(e) =>
-									setValues({
-										...values,
-										address: { ...values.address, city: e.target.value },
-									})
-								}
-							/>
-						</div>
-					</div>
-					<DialogFooter>
-						<Button
-							type="submit"
-							disabled={loading}
-							className="flex items-center gap-2 cursor-pointer">
-							{loading && <LoaderCircleIcon className="h-4 w-4 animate-spin" />}
-							Enregistrer
-						</Button>
-					</DialogFooter>
-				</form>
 			</DialogContent>
 		</Dialog>
 	);
