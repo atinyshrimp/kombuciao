@@ -580,12 +580,25 @@ const EditStoreModal = ({
 }) => {
 	const [loading, setLoading] = useState(false);
 	const [values, setValues] = useState({
-		name: store.name,
+		name: "",
 		address: {
-			street: store.address.street,
-			city: store.address.city,
+			street: "",
+			city: "",
 		},
+		openingHours: "",
 	});
+
+	useEffect(() => {
+		if (!store) return;
+		setValues({
+			name: store.name,
+			address: {
+				street: store.address.street,
+				city: store.address.city,
+			},
+			openingHours: store.openingHours || "",
+		});
+	}, [store]);
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
