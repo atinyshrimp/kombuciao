@@ -123,17 +123,7 @@ export default function RootLayout({
 						</div>
 					</footer>
 				</div>
-				<Toaster
-					richColors
-					position="top-center"
-					toastOptions={{
-						style: {
-							background: "hsl(var(--card))",
-							border: "1px solid hsl(var(--border))",
-							color: "hsl(var(--card-foreground))",
-						},
-					}}
-				/>
+				<Toaster richColors position="top-center" />
 			</body>
 		</html>
 	);
