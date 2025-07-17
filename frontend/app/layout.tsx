@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Heart, Milk } from "lucide-react";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -15,8 +15,28 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Kombuciao",
-	description: "Trouvons ensemble le tant recherché Ciao Kombucha !",
+	title: "Kombuciao - Trouvez votre Ciao Kombucha",
+	description:
+		"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
+	keywords: [
+		"kombucha",
+		"ciao",
+		"kombuciao",
+		"ciao kombucha",
+		"ciao kombucha paris",
+		"squeezie",
+		"squeezie kombucha",
+		"squeezie ciao kombucha",
+	],
+	openGraph: {
+		type: "website",
+		title: "Kombuciao - Trouvez votre Ciao Kombucha",
+		description:
+			"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
+		siteName: "Kombuciao",
+		locale: "fr_FR",
+		countryName: "France",
+	},
 };
 
 export default function RootLayout({
@@ -27,54 +47,80 @@ export default function RootLayout({
 	return (
 		<html lang="fr">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<div className="flex flex-col items-center justify-items-center p-8 pb-20 gap-16 font-[family-name:var(--font-geist-sans)]">
-					<main className="h-[93dvh] w-full flex flex-col gap-[32px] max-w-7xl mx-auto row-start-2 items-center sm:items-start">
-						{children}
-					</main>
-					<footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-						<a
-							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-							href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-							target="_blank"
-							rel="noopener noreferrer">
-							<Image
-								aria-hidden
-								src="/file.svg"
-								alt="File icon"
-								width={16}
-								height={16}
-							/>
-							Learn
-						</a>
-						<a
-							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-							href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-							target="_blank"
-							rel="noopener noreferrer">
-							<Image
-								aria-hidden
-								src="/window.svg"
-								alt="Window icon"
-								width={16}
-								height={16}
-							/>
-							Examples
-						</a>
-						<a
-							className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-							href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-							target="_blank"
-							rel="noopener noreferrer">
-							<Image
-								aria-hidden
-								src="/globe.svg"
-								alt="Globe icon"
-								width={16}
-								height={16}
-							/>
-							Go to nextjs.org →
-						</a>
+				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20`}>
+				<div className="min-h-screen flex flex-col">
+					{/* Header */}
+					<header className="sticky top-0 z-40 w-full border-b border-slate-200/60 bg-white/80 backdrop-blur-xl dark:border-slate-800/60 dark:bg-slate-950/80">
+						<div className="container mx-auto px-4 py-4">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-3">
+									<div className="relative">
+										<div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center shadow-lg">
+											<Milk className="w-5 h-5 text-white" />
+										</div>
+									</div>
+									<div>
+										<h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent dark:from-white dark:to-slate-300">
+											Kombuciao
+										</h1>
+										<p className="text-xs text-slate-500 dark:text-slate-400">
+											Trouvez votre Ciao Kombucha
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</header>
+
+					{/* Main Content */}
+					<main className="flex-1 container mx-auto px-4 py-6">{children}</main>
+
+					{/* Footer */}
+					<footer className="border-t border-slate-200/60 bg-white/60 backdrop-blur-sm dark:border-slate-800/60 dark:bg-slate-950/60">
+						<div className="container mx-auto px-4 py-8">
+							<div className="flex flex-col items-center gap-6 text-center">
+								{/* Main Footer Content */}
+								<div className="flex flex-col items-center gap-4">
+									<div className="flex items-center gap-2">
+										<Heart className="w-4 h-4 text-rose-500" />
+										<span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+											Fait avec amour pour les amateurs de Kombucha
+										</span>
+									</div>
+									<p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
+										Découvrez où trouver votre Ciao Kombucha préféré. Localisez
+										les magasins avec les saveurs disponibles en temps réel.
+									</p>
+								</div>
+
+								{/* Links */}
+								<div className="flex items-center gap-6 text-xs">
+									<a
+										href="#"
+										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+										À propos
+									</a>
+									<a
+										href="#"
+										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+										Contact
+									</a>
+									<a
+										href="#"
+										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+										Mentions légales
+									</a>
+								</div>
+
+								{/* Bottom */}
+								<div className="pt-4 border-t border-slate-200/60 dark:border-slate-800/60 w-full">
+									<p className="text-xs text-slate-400 dark:text-slate-500">
+										© {new Date().getFullYear()} Kombuciao. Tous droits
+										réservés.
+									</p>
+								</div>
+							</div>
+						</div>
 					</footer>
 				</div>
 				<Toaster richColors position="top-center" />

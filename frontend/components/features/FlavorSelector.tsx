@@ -10,7 +10,7 @@ const FlavorSelector = ({
 	setSelectedFlavors: (flavors: Option[]) => void;
 }) => {
 	return (
-		<div className="flex flex-wrap gap-2 mt-2">
+		<div className="w-full">
 			<MultipleSelector
 				options={Object.entries(FLAVORS).map(([key, label]) => ({
 					value: key,
@@ -19,7 +19,7 @@ const FlavorSelector = ({
 				value={selectedFlavors}
 				onChange={setSelectedFlavors}
 				placeholder="Sélectionner des saveurs"
-				className="w-full"
+				className="w-full bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
 				hidePlaceholderWhenSelected
 			/>
 		</div>

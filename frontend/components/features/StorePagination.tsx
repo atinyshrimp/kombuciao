@@ -18,7 +18,7 @@ const StorePagination = ({
 	currentPage,
 	setCurrentPage,
 	totalPages,
-	paginationItemsToDisplay = 5,
+	paginationItemsToDisplay = 3,
 }: {
 	currentPage: number;
 	setCurrentPage: (page: number) => void;
@@ -31,92 +31,96 @@ const StorePagination = ({
 		paginationItemsToDisplay,
 	});
 
+	if (totalPages <= 1) return null;
+
 	return (
-		<Pagination>
-			<PaginationContent>
-				{/* First page button */}
-				<PaginationItem>
-					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
-						onClick={() => {
-							setCurrentPage(1);
-						}}
-						aria-label="Go to first page"
-						aria-disabled={currentPage === 1 ? true : undefined}
-						role={currentPage === 1 ? "link" : undefined}>
-						<ChevronFirstIcon size={16} aria-hidden="true" />
-					</PaginationLink>
-				</PaginationItem>
-
-				{/* Previous page button */}
-				<PaginationItem>
-					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
-						onClick={() => {
-							if (currentPage > 1) setCurrentPage(currentPage - 1);
-						}}
-						aria-label="Go to previous page"
-						aria-disabled={currentPage === 1 ? true : undefined}
-						role={currentPage === 1 ? "link" : undefined}>
-						<ChevronLeftIcon size={16} aria-hidden="true" />
-					</PaginationLink>
-				</PaginationItem>
-
-				{/* Left ellipsis (...) */}
-				{showLeftEllipsis && (
+		<div className="flex items-center justify-between max-w-full">
+			<Pagination>
+				<PaginationContent className="px-4 bg-white/60 backdrop-blur-sm border border-slate-200/60 rounded-xl shadow-sm dark:bg-slate-900/60 dark:border-slate-800/60">
+					{/* First page button */}
 					<PaginationItem>
-						<PaginationEllipsis />
-					</PaginationItem>
-				)}
-
-				{/* Page number links */}
-				{pages.map((page) => (
-					<PaginationItem key={page}>
 						<PaginationLink
-							className="cursor-pointer"
-							onClick={() => setCurrentPage(page)}
-							isActive={page === currentPage}>
-							{page}
+							className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+							onClick={() => {
+								setCurrentPage(1);
+							}}
+							aria-label="Go to first page"
+							aria-disabled={currentPage === 1 ? true : undefined}
+							role={currentPage === 1 ? "link" : undefined}>
+							<ChevronFirstIcon size={16} aria-hidden="true" />
 						</PaginationLink>
 					</PaginationItem>
-				))}
 
-				{/* Right ellipsis (...) */}
-				{showRightEllipsis && (
+					{/* Previous page button */}
 					<PaginationItem>
-						<PaginationEllipsis />
+						<PaginationLink
+							className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+							onClick={() => {
+								if (currentPage > 1) setCurrentPage(currentPage - 1);
+							}}
+							aria-label="Go to previous page"
+							aria-disabled={currentPage === 1 ? true : undefined}
+							role={currentPage === 1 ? "link" : undefined}>
+							<ChevronLeftIcon size={16} aria-hidden="true" />
+						</PaginationLink>
 					</PaginationItem>
-				)}
 
-				{/* Next page button */}
-				<PaginationItem>
-					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
-						onClick={() => {
-							if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-						}}
-						aria-label="Go to next page"
-						aria-disabled={currentPage === totalPages ? true : undefined}
-						role={currentPage === totalPages ? "link" : undefined}>
-						<ChevronRightIcon size={16} aria-hidden="true" />
-					</PaginationLink>
-				</PaginationItem>
+					{/* Left ellipsis (...) */}
+					{showLeftEllipsis && (
+						<PaginationItem>
+							<PaginationEllipsis />
+						</PaginationItem>
+					)}
 
-				{/* Last page button */}
-				<PaginationItem>
-					<PaginationLink
-						className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer"
-						onClick={() => {
-							setCurrentPage(totalPages);
-						}}
-						aria-label="Go to last page"
-						aria-disabled={currentPage === totalPages ? true : undefined}
-						role={currentPage === totalPages ? "link" : undefined}>
-						<ChevronLastIcon size={16} aria-hidden="true" />
-					</PaginationLink>
-				</PaginationItem>
-			</PaginationContent>
-		</Pagination>
+					{/* Page number links */}
+					{pages.map((page) => (
+						<PaginationItem key={page}>
+							<PaginationLink
+								className="cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+								onClick={() => setCurrentPage(page)}
+								isActive={page === currentPage}>
+								{page}
+							</PaginationLink>
+						</PaginationItem>
+					))}
+
+					{/* Right ellipsis (...) */}
+					{showRightEllipsis && (
+						<PaginationItem>
+							<PaginationEllipsis />
+						</PaginationItem>
+					)}
+
+					{/* Next page button */}
+					<PaginationItem>
+						<PaginationLink
+							className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+							onClick={() => {
+								if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+							}}
+							aria-label="Go to next page"
+							aria-disabled={currentPage === totalPages ? true : undefined}
+							role={currentPage === totalPages ? "link" : undefined}>
+							<ChevronRightIcon size={16} aria-hidden="true" />
+						</PaginationLink>
+					</PaginationItem>
+
+					{/* Last page button */}
+					<PaginationItem>
+						<PaginationLink
+							className="aria-disabled:pointer-events-none aria-disabled:opacity-50 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+							onClick={() => {
+								setCurrentPage(totalPages);
+							}}
+							aria-label="Go to last page"
+							aria-disabled={currentPage === totalPages ? true : undefined}
+							role={currentPage === totalPages ? "link" : undefined}>
+							<ChevronLastIcon size={16} aria-hidden="true" />
+						</PaginationLink>
+					</PaginationItem>
+				</PaginationContent>
+			</Pagination>
+		</div>
 	);
 };
 

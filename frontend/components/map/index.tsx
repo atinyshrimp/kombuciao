@@ -31,7 +31,10 @@ export default function StoreMap({
 
 	return (
 		<div className="relative w-full h-full">
-			<StatsCard stores={stores || []} center={center} radius={radius} />
+			{/* Only show stats card on desktop (lg+) screens */}
+			<div className="hidden lg:block">
+				<StatsCard stores={stores || []} center={center} radius={radius} />
+			</div>
 			<MapComponent stores={stores} location={location} radius={radius} />
 		</div>
 	);

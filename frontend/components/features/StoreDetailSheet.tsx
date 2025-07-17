@@ -92,7 +92,7 @@ export default function StoreDetailSheet({
 					side="right"
 					className="w-full sm:max-w-lg p-0 overflow-hidden">
 					{/* Loading Header */}
-					<div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 text-white p-6 pb-8">
+					<div className="relative bg-gradient-to-br from-emerald-600 via-teal-500 to-blue-600 text-white p-6 pb-8">
 						<div className="absolute inset-0 bg-black/10" />
 						<div className="relative">
 							<div className="flex items-start justify-between mb-4">
@@ -115,7 +115,7 @@ export default function StoreDetailSheet({
 							{[1, 2, 3].map((i) => (
 								<div key={i} className="space-y-3">
 									<Skeleton className="h-5 w-40" />
-									<div className="bg-gray-50 rounded-lg p-4">
+									<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 border border-slate-200/40 dark:border-slate-700/40">
 										<Skeleton className="h-4 w-full mb-2" />
 										<Skeleton className="h-4 w-2/3" />
 									</div>
@@ -130,6 +130,7 @@ export default function StoreDetailSheet({
 
 	const openingStatus = getOpeningStatus(store.openingHours || "");
 	const parsedHours = parseOpeningHours(store.openingHours || "");
+	console.log(parsedHours);
 
 	return (
 		<>
@@ -143,7 +144,7 @@ export default function StoreDetailSheet({
 					side="right"
 					className="w-full sm:max-w-lg p-0 overflow-hidden">
 					{/* Header with gradient background */}
-					<div className="relative bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600 text-white p-6 pb-8">
+					<div className="relative bg-gradient-to-br from-emerald-600 via-teal-500 to-blue-600 text-white p-6 pb-8">
 						<div className="absolute inset-0 bg-black/10" />
 						<div className="relative">
 							<div className="flex items-start justify-between mb-4">
@@ -166,7 +167,7 @@ export default function StoreDetailSheet({
 								{store.distance && (
 									<Badge
 										variant="secondary"
-										className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+										className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm">
 										À {(store.distance / 1000).toFixed(1)} km
 									</Badge>
 								)}
@@ -174,7 +175,7 @@ export default function StoreDetailSheet({
 								{store.openingHours && (
 									<Badge
 										variant="secondary"
-										className={`border-white/30 ${
+										className={`border-white/30 backdrop-blur-sm ${
 											openingStatus.isOpen
 												? "bg-green-500/20 text-green-100 border-green-300/30"
 												: "bg-red-500/20 text-red-100 border-red-300/30"
@@ -187,7 +188,7 @@ export default function StoreDetailSheet({
 								{store.types && store.types.length > 0 && (
 									<Badge
 										variant="secondary"
-										className="bg-white/20 text-white border-white/30 hover:bg-white/30">
+										className="bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm">
 										{TYPES[store.types[0] as keyof typeof TYPES]}
 									</Badge>
 								)}
@@ -202,36 +203,50 @@ export default function StoreDetailSheet({
 							{store.openingHours && (
 								<div className="space-y-3">
 									<div className="flex items-center justify-between">
-										<h3 className="font-semibold text-base flex items-center gap-2">
-											<Clock className="h-4 w-4 text-blue-600" />
+										<h3 className="font-semibold text-base flex items-center gap-2 text-slate-900 dark:text-slate-100">
+											<Clock className="h-4 w-4 text-emerald-600" />
 											Horaires d&apos;ouverture
 										</h3>
 										<span
 											className={`text-sm font-medium ${
-												openingStatus.isOpen ? "text-green-600" : "text-red-600"
+												openingStatus.isOpen
+													? "text-emerald-600"
+													: "text-red-600"
 											}`}>
 											{openingStatus.status}
 										</span>
 									</div>
 
 									{parsedHours.length > 0 ? (
-										<div className="bg-gray-50 rounded-lg p-4 space-y-2">
-											{parsedHours.map((hours, index) => (
+										<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 space-y-2 border border-slate-200/40 dark:border-slate-700/40">
+											{parsedHours.map((schedule, index) => (
 												<div
 													key={index}
 													className="flex justify-between items-center text-sm">
-													<span className="font-medium text-gray-700">
-														{hours.dayFrench}
+													<span className="font-medium text-slate-700 dark:text-slate-300">
+														{schedule.day}
 													</span>
-													<span className="text-gray-600">
-														{hours.open} - {hours.close}
-													</span>
+													{schedule.isOpen && (
+														<span className="text-slate-600 dark:text-slate-400">
+															{schedule.timeRanges
+																.map(
+																	(timeRange) =>
+																		`${timeRange.open} - ${timeRange.close}`
+																)
+																.join(" | ")}
+														</span>
+													)}
+													{!schedule.isOpen && (
+														<span className="text-red-600 dark:text-red-400">
+															Fermé
+														</span>
+													)}
 												</div>
 											))}
 										</div>
 									) : (
-										<div className="bg-gray-50 rounded-lg p-4">
-											<p className="text-sm text-gray-600">
+										<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 border border-slate-200/40 dark:border-slate-700/40">
+											<p className="text-sm text-slate-600 dark:text-slate-400">
 												{store.openingHours}
 											</p>
 										</div>
@@ -242,19 +257,21 @@ export default function StoreDetailSheet({
 							{/* Reports Section */}
 							<div className="space-y-3">
 								<div className="flex items-center justify-between">
-									<h3 className="font-semibold text-base flex items-center gap-2">
-										<MessageSquare className="h-4 w-4 text-blue-600" />
+									<h3 className="font-semibold text-base flex items-center gap-2 text-slate-900 dark:text-slate-100">
+										<MessageSquare className="h-4 w-4 text-emerald-600" />
 										Signalements Kombucha
 									</h3>
 									<div className="flex items-center gap-2">
-										<Badge variant="secondary" className="text-xs">
+										<Badge
+											variant="secondary"
+											className="text-xs bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60">
 											{reports.length} signalement
 											{reports.length !== 1 ? "s" : ""}
 										</Badge>
 										<Button
 											variant="ghost"
 											size="sm"
-											className="text-xs cursor-pointer"
+											className="text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
 											onClick={() => setShowReportModal(true)}>
 											<Plus className="h-4 w-4" />
 										</Button>
@@ -264,7 +281,9 @@ export default function StoreDetailSheet({
 								{loading ? (
 									<div className="space-y-3">
 										{[1, 2, 3].map((i) => (
-											<div key={i} className="bg-gray-50 rounded-lg p-4">
+											<div
+												key={i}
+												className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 border border-slate-200/40 dark:border-slate-700/40">
 												<div className="flex items-center justify-between mb-3">
 													<div className="flex gap-2">
 														<Skeleton className="h-6 w-6 rounded-full" />
@@ -278,12 +297,12 @@ export default function StoreDetailSheet({
 										))}
 									</div>
 								) : reports.length === 0 ? (
-									<div className="bg-gray-50 rounded-lg p-8 text-center">
-										<MessageSquare className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-										<p className="text-sm font-medium text-gray-900 mb-1">
+									<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-8 text-center border border-slate-200/40 dark:border-slate-700/40">
+										<MessageSquare className="h-8 w-8 text-slate-400 mx-auto mb-3" />
+										<p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
 											Aucun signalement
 										</p>
-										<p className="text-xs text-gray-500">
+										<p className="text-xs text-slate-500 dark:text-slate-400">
 											Soyez le premier à signaler la disponibilité de kombucha
 											dans ce magasin !
 										</p>
@@ -358,8 +377,9 @@ const VoteButtons = ({
 				variant="outline"
 				size="sm"
 				className={cn(
-					"h-8 px-2 flex items-center gap-1 text-green-600 cursor-pointer hover:text-green-700 hover:bg-green-50",
-					isConfirmed && "text-green-600 bg-green-50",
+					"h-8 px-2 flex items-center gap-1 text-emerald-600 cursor-pointer hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/60",
+					isConfirmed &&
+						"text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30",
 					userVote && "pointer-events-none"
 				)}
 				aria-label="Confirmer"
@@ -377,8 +397,8 @@ const VoteButtons = ({
 				variant="outline"
 				size="sm"
 				className={cn(
-					"h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer hover:text-red-700 hover:bg-red-50",
-					isDenied && "text-red-600 bg-red-50",
+					"h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200/60 dark:border-red-800/60",
+					isDenied && "text-red-600 bg-red-50 dark:bg-red-950/30",
 					userVote && "pointer-events-none"
 				)}
 				aria-label="Contester"
@@ -406,7 +426,7 @@ const ReportCard = ({
 	return (
 		<div
 			key={report._id}
-			className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
+			className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm border border-slate-200/60 dark:border-slate-800/60 rounded-xl p-4 hover:shadow-lg transition-all duration-200">
 			<div className="flex items-start justify-between mb-3">
 				<div className="flex flex-wrap gap-1.5">
 					{report.flavors.map((flavor) => {
@@ -416,14 +436,14 @@ const ReportCard = ({
 						return (
 							<span
 								key={flavor}
-								className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"
+								className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60"
 								title={label}>
 								{icon}
 							</span>
 						);
 					})}
 				</div>
-				<div className="flex items-center gap-3 text-xs text-gray-500">
+				<div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
 					<div className="flex items-center gap-1">
 						<Users className="h-3 w-3" />
 						<span>{report.votes.length}</span>
@@ -432,18 +452,18 @@ const ReportCard = ({
 			</div>
 
 			{report.description && (
-				<p className="text-sm text-gray-600 mb-3 leading-relaxed">
+				<p className="text-sm text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
 					{report.description}
 				</p>
 			)}
 
 			<div className="flex items-end justify-between">
 				<div className="flex flex-col items-start">
-					<span className="text-xs text-gray-500">
+					<span className="text-xs text-slate-500 dark:text-slate-400">
 						Signalé le {getDateString(new Date(report.createdAt))}
 					</span>
 					{report.votes.length > 1 && (
-						<span className="text-xs text-gray-500">
+						<span className="text-xs text-slate-500 dark:text-slate-400">
 							Dernier vote le {getDateString(new Date(report.updatedAt))}
 						</span>
 					)}
@@ -498,29 +518,35 @@ const CreateReportModal = ({
 
 	return (
 		<Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-			<DialogContent className="max-w-2xl">
+			<DialogContent className="px-4 lg:px-0 lg:max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
 				<DialogHeader>
-					<DialogTitle>Créer un signalement</DialogTitle>
+					<DialogTitle className="text-slate-900 dark:text-slate-100">
+						Créer un signalement
+					</DialogTitle>
 				</DialogHeader>
-				<DialogDescription>
+				<DialogDescription className="text-slate-600 dark:text-slate-400">
 					Signaler la disponibilité de kombucha chez {store.name} à{" "}
 					{store.address.city}
 				</DialogDescription>
 				<div className="space-y-4">
 					<div className="space-y-2">
-						<label htmlFor="description" className="block text-sm font-medium">
+						<label
+							htmlFor="description"
+							className="block text-sm font-medium text-slate-900 dark:text-slate-100">
 							Où chercher le kombucha ?
 						</label>
 						<textarea
 							id="description"
 							rows={4}
-							className="w-full max-h-20 p-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+							className="w-full max-h-20 p-3 rounded-xl border-slate-200/60 dark:border-slate-700/60 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-slate-900 dark:text-slate-100"
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
 						/>
 					</div>
 					<div className="space-y-2">
-						<label htmlFor="flavors" className="block text-sm font-medium">
+						<label
+							htmlFor="flavors"
+							className="block text-sm font-medium text-slate-900 dark:text-slate-100">
 							Quelles saveurs t&apos;as trouvées ?
 						</label>
 						<FlavorSelector
@@ -534,13 +560,13 @@ const CreateReportModal = ({
 						variant="outline"
 						onClick={() => setShowReportModal(false)}
 						disabled={loading}
-						className="cursor-pointer">
+						className="cursor-pointer border-slate-200/60 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800">
 						Annuler
 					</Button>
 					<Button
 						onClick={handleCreateReport}
 						disabled={loading}
-						className="flex items-center gap-2 cursor-pointer">
+						className="flex items-center gap-2 cursor-pointer bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700">
 						{loading && <LoaderCircleIcon className="h-4 w-4 animate-spin" />}
 						Créer le signalement
 					</Button>
