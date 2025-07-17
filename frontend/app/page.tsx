@@ -367,7 +367,7 @@ function Filters({
 	return (
 		<Card className="p-6 bg-white/60 backdrop-blur-sm border-slate-200/60 dark:bg-slate-900/60 dark:border-slate-800/60 shadow-sm z-10">
 			<Collapsible>
-				<CollapsibleTrigger className="flex items-center gap-2 cursor-pointer">
+				<CollapsibleTrigger className="w-full flex items-center gap-2 cursor-pointer">
 					<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
 					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
 						Filtres
