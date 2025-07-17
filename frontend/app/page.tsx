@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, MapPin, Filter, List } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,11 @@ import StoreDetailSheet from "@/components/features/StoreDetailSheet";
 import FlavorSelector from "@/components/features/FlavorSelector";
 import StoreMap from "@/components/map";
 import { formatNumber } from "@/lib/utils";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -140,9 +145,9 @@ export default function HomePage() {
 
 	return (
 		<StoreProvider>
-			<div className="h-full w-full flex flex-col gap-5 md:flex-row text-foreground">
-				{/* ───────────────── LEFT PANEL (md+) ───────────────── */}
-				<aside className="hidden md:flex md:w-80 lg:w-96 flex-col gap-4 p-4 bg-background max-h-full">
+			<div className="h-[calc(100vh-8rem)] w-full flex flex-col gap-6 lg:flex-row text-foreground">
+				{/* ───────────────── LEFT PANEL (lg+) ───────────────── */}
+				<aside className="hidden lg:flex lg:w-96 xl:w-[420px] flex-col gap-2 bg-white/60 backdrop-blur-sm border border-slate-200/60 rounded-2xl p-6 shadow-xl dark:bg-slate-900/60 dark:border-slate-800/60">
 					<Header
 						search={search}
 						setSearch={setSearch}
@@ -156,57 +161,69 @@ export default function HomePage() {
 						selectedFlavors={selectedFlavors}
 						setSelectedFlavors={setSelectedFlavors}
 					/>
-					<StoreList stores={stores} loading={loading} />
-					<StorePagination
-						currentPage={currentPage}
-						setCurrentPage={setCurrentPage}
-						totalPages={totalPages}
-					/>
+					<div className="flex flex-col gap-2 overflow-y-auto">
+						<StoreList stores={stores} loading={loading} />
+						<StorePagination
+							currentPage={currentPage}
+							setCurrentPage={setCurrentPage}
+							totalPages={totalPages}
+						/>
+					</div>
 				</aside>
 
 				{/* ───────────────── MAP ───────────────── */}
-				<section className="flex-1 relative h-full md:h-auto">
+				<section className="flex-1 relative h-full lg:h-auto bg-white/40 backdrop-blur-sm border border-slate-200/60 rounded-2xl shadow-xl dark:bg-slate-900/40 dark:border-slate-800/60 overflow-hidden">
 					<StoreMap
 						key={`storemap-${location?.[0]}-${location?.[1]}`}
 						stores={stores}
 						radius={radius}
 						location={location}
 					/>
+
 					{/* Mobile toggle */}
 					<Button
 						variant="secondary"
-						className="md:hidden cursor-pointer absolute top-4 left-4 z-20 shadow-lg"
+						className="lg:hidden absolute top-4 left-4 z-20 shadow-lg bg-white/90 backdrop-blur-sm border border-slate-200/60 hover:bg-white dark:bg-slate-900/90 dark:border-slate-800/60 dark:hover:bg-slate-900"
 						onClick={() => setShowMobileList(true)}>
+						<List className="w-4 h-4 mr-2" />
 						Stores & Filters
 					</Button>
 				</section>
 
 				{/* ───────────────── MOBILE DRAWER ───────────────── */}
 				<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
-					<SheetContent side="bottom" className="p-4 pb-8">
-						<SheetHeader>
-							<div className="w-full h-1.5 rounded-full bg-muted-foreground/40 mx-auto mb-2" />
+					<SheetContent side="bottom" className="p-0 pb-8 max-h-[85vh]">
+						<SheetHeader className="px-6 py-4 border-b border-slate-200/60 dark:border-slate-800/60">
+							<div className="flex items-center justify-between w-full">
+								<div className="w-full h-1.5 rounded-full bg-slate-300/60 dark:bg-slate-600/60 mx-auto mb-2" />
+							</div>
+							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+								Recherche & Filtres
+							</h2>
 						</SheetHeader>
-						<Header
-							search={search}
-							setSearch={setSearch}
-							setLocation={setLocation}
-						/>
-						<Filters
-							radius={radius}
-							setRadius={setRadius}
-							onlyAvailable={onlyAvailable}
-							setOnlyAvailable={setOnlyAvailable}
-							selectedFlavors={selectedFlavors}
-							setSelectedFlavors={setSelectedFlavors}
-						/>
-						<div className="h-[40vh] overflow-y-auto mt-4 pr-2">
-							<StoreList stores={stores} loading={loading} />
-							<StorePagination
-								currentPage={currentPage}
-								setCurrentPage={setCurrentPage}
-								totalPages={totalPages}
+
+						<div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+							<Header
+								search={search}
+								setSearch={setSearch}
+								setLocation={setLocation}
 							/>
+							<Filters
+								radius={radius}
+								setRadius={setRadius}
+								onlyAvailable={onlyAvailable}
+								setOnlyAvailable={setOnlyAvailable}
+								selectedFlavors={selectedFlavors}
+								setSelectedFlavors={setSelectedFlavors}
+							/>
+							<div className="space-y-4">
+								<StoreList stores={stores} loading={loading} />
+								<StorePagination
+									currentPage={currentPage}
+									setCurrentPage={setCurrentPage}
+									totalPages={totalPages}
+								/>
+							</div>
 						</div>
 					</SheetContent>
 				</Sheet>
@@ -277,30 +294,36 @@ function Header({
 	}
 
 	return (
-		<div className="relative">
-			<Input
-				value={search}
-				onFocus={() => setSearching(true)}
-				onBlur={() => setSearching(false)}
-				onChange={(e) => setSearch(e.target.value)}
-				placeholder="Entrer une adresse ou une ville"
-				className="text-sm ps-9 peer"
-			/>
-			<div className="text-muted-foreground/80 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
-				<SearchIcon size={16} aria-hidden="true" />
-			</div>
-			{results.length > 0 && (
-				<div className="absolute z-50 w-full top-full mt-1 bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
-					{results.map((result: SearchResult, index) => (
-						<div
-							key={result.properties.osm_id || index}
-							className="flex flex-col px-3 py-2 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground border-b border-border last:border-b-0"
-							onClick={() => handleResultClick(result)}>
-							<SearchResult result={result} />
-						</div>
-					))}
+		<div className="space-y-2">
+			<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+				<SearchIcon className="w-4 h-4" />
+				Localisation
+			</h3>
+			<div className="relative">
+				<Input
+					value={search}
+					onFocus={() => setSearching(true)}
+					onBlur={() => setSearching(false)}
+					onChange={(e) => setSearch(e.target.value)}
+					placeholder="Entrer une adresse ou une ville"
+					className="text-sm ps-10 peer bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
+				/>
+				<div className="text-slate-400 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
+					<MapPin size={16} aria-hidden="true" />
 				</div>
-			)}
+				{results.length > 0 && (
+					<div className="absolute z-50 w-full top-full mt-2 bg-white/95 backdrop-blur-sm border border-slate-200/60 rounded-xl shadow-xl max-h-60 overflow-y-auto dark:bg-slate-900/95 dark:border-slate-800/60">
+						{results.map((result: SearchResult, index) => (
+							<div
+								key={result.properties.osm_id || index}
+								className="flex flex-col px-4 py-3 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-100/60 dark:border-slate-800/60 last:border-b-0 transition-colors"
+								onClick={() => handleResultClick(result)}>
+								<SearchResult result={result} />
+							</div>
+						))}
+					</div>
+				)}
+			</div>
 		</div>
 	);
 }
@@ -314,8 +337,10 @@ const SearchResult = ({ result }: { result: SearchResult }) => {
 
 	return (
 		<div className="flex flex-col">
-			<p className="font-medium">{mainText}</p>
-			<p className="text-xs text-muted-foreground">{subText}</p>
+			<p className="font-medium text-slate-900 dark:text-slate-100">
+				{mainText}
+			</p>
+			<p className="text-xs text-slate-500 dark:text-slate-400">{subText}</p>
 		</div>
 	);
 };
@@ -340,41 +365,67 @@ function Filters({
 	const [currentRadius, setCurrentRadius] = useState(radius);
 
 	return (
-		<Card className="p-4 space-y-4 bg-card">
-			<div className="flex items-center justify-between">
-				<span className="text-sm font-medium">
-					Afficher uniquement les magasins
-					<br />
-					avec des produits disponibles
-				</span>
-				<Switch
-					className="cursor-pointer"
-					checked={onlyAvailable}
-					onCheckedChange={setOnlyAvailable}
-				/>
-			</div>
+		<Card className="p-6 bg-white/60 backdrop-blur-sm border-slate-200/60 dark:bg-slate-900/60 dark:border-slate-800/60 shadow-sm z-10">
+			<Collapsible>
+				<CollapsibleTrigger className="flex items-center gap-2 cursor-pointer">
+					<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+						Filtres
+					</h3>
+				</CollapsibleTrigger>
 
-			<div>
-				<label className="text-sm font-medium">
-					Rayon : {formatNumber(currentRadius / 1000)} km
-				</label>
-				<Slider
-					min={100}
-					max={5000}
-					step={100}
-					value={[currentRadius]}
-					onValueChange={(v) => setCurrentRadius(v[0])}
-					onValueCommit={(v) => setRadius(v[0])}
-				/>
-			</div>
+				<CollapsibleContent className="space-y-6 mt-2">
+					{/* Availability Filter */}
+					<div className="flex items-center justify-between p-4 bg-slate-50/80 dark:bg-slate-800/80 rounded-xl border border-slate-200/40 dark:border-slate-700/40">
+						<div className="flex-1">
+							<span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+								Produits disponibles uniquement
+							</span>
+							<p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+								Afficher seulement les magasins avec stock
+							</p>
+						</div>
+						<Switch
+							className="cursor-pointer"
+							checked={onlyAvailable}
+							onCheckedChange={setOnlyAvailable}
+						/>
+					</div>
 
-			<div>
-				<label className="text-sm font-medium">Saveurs</label>
-				<FlavorSelector
-					selectedFlavors={selectedFlavors}
-					setSelectedFlavors={setSelectedFlavors}
-				/>
-			</div>
+					{/* Radius Filter */}
+					<div className="space-y-3">
+						<label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+							Rayon de recherche: {formatNumber(currentRadius / 1000)} km
+						</label>
+						<div className="px-2">
+							<Slider
+								min={100}
+								max={5000}
+								step={100}
+								value={[currentRadius]}
+								onValueChange={(v) => setCurrentRadius(v[0])}
+								onValueCommit={(v) => setRadius(v[0])}
+								className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
+							/>
+						</div>
+						<div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+							<span>100m</span>
+							<span>5km</span>
+						</div>
+					</div>
+
+					{/* Flavors Filter */}
+					<div className="space-y-3">
+						<label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+							Saveurs préférées
+						</label>
+						<FlavorSelector
+							selectedFlavors={selectedFlavors}
+							setSelectedFlavors={setSelectedFlavors}
+						/>
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
 		</Card>
 	);
 }
@@ -391,7 +442,7 @@ function StoreList({
 
 	if (loading) {
 		return (
-			<div className="space-y-3 h-full">
+			<div className="space-y-3">
 				{dummy.map((_, i) => (
 					<StoreCardSkeleton key={i} />
 				))}
@@ -400,12 +451,23 @@ function StoreList({
 	}
 
 	return (
-		<div className="space-y-3 h-full overflow-y-auto">
+		<div className="space-y-3 overflow-y-auto">
 			{(!stores || !stores.length) && (
-				<Card className="p-4 text-center">
-					<p className="text-sm text-muted-foreground">
-						No stores found in this area.
-					</p>
+				<Card className="p-8 text-center bg-white/60 backdrop-blur-sm border-slate-200/60 dark:bg-slate-900/60 dark:border-slate-800/60">
+					<div className="space-y-3">
+						<div className="w-16 h-16 mx-auto bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center">
+							<MapPin className="w-8 h-8 text-slate-400" />
+						</div>
+						<div>
+							<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+								Aucun magasin trouvé
+							</p>
+							<p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+								Essayez d&apos;élargir votre recherche ou changer de
+								localisation
+							</p>
+						</div>
+					</div>
 				</Card>
 			)}
 			{stores &&
