@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Sheet, SheetContent, SheetHeader } from "@/components/ui/sheet";
+import {
+	Sheet,
+	SheetContent,
+	SheetHeader,
+	SheetTitle,
+} from "@/components/ui/sheet";
 import { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
@@ -27,6 +32,7 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { StatsCardMobile } from "@/components/cards/StatsCard";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -183,39 +189,108 @@ export default function HomePage() {
 					{/* Mobile toggle */}
 					<Button
 						variant="secondary"
-						className="lg:hidden absolute top-4 left-4 z-20 shadow-lg bg-white/90 backdrop-blur-sm border border-slate-200/60 hover:bg-white dark:bg-slate-900/90 dark:border-slate-800/60 dark:hover:bg-slate-900"
+						className="lg:hidden absolute top-4 right-4 z-20 shadow-lg bg-white/90 backdrop-blur-sm border border-slate-200/60 hover:bg-white dark:bg-slate-900/90 dark:border-slate-800/60 dark:hover:bg-slate-900"
 						onClick={() => setShowMobileList(true)}>
 						<List className="w-4 h-4 mr-2" />
-						Stores & Filters
+						Magasins & Filtres
 					</Button>
 				</section>
 
 				{/* ───────────────── MOBILE DRAWER ───────────────── */}
 				<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
-					<SheetContent side="bottom" className="p-0 pb-8 max-h-[85vh]">
-						<SheetHeader className="px-6 py-4 border-b border-slate-200/60 dark:border-slate-800/60">
-							<div className="flex items-center justify-between w-full">
-								<div className="w-full h-1.5 rounded-full bg-slate-300/60 dark:bg-slate-600/60 mx-auto mb-2" />
-							</div>
-							<h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+					<SheetContent side="bottom" className="p-0 pb-6 max-h-[85vh]">
+						{/* Header with handlebar */}
+						<SheetHeader className="px-4 py-2 border-b border-slate-200/60 dark:border-slate-800/60">
+							<div className="w-full h-1.5 rounded-full bg-slate-300/60 dark:bg-slate-600/60 mx-auto mb-2" />
+							<SheetTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
 								Recherche & Filtres
-							</h2>
+							</SheetTitle>
 						</SheetHeader>
 
-						<div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+						{/* Scrollable Content */}
+						<div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 text-sm">
+							{/* Location Search */}
 							<Header
 								search={search}
 								setSearch={setSearch}
 								setLocation={setLocation}
 							/>
-							<Filters
-								radius={radius}
-								setRadius={setRadius}
-								onlyAvailable={onlyAvailable}
-								setOnlyAvailable={setOnlyAvailable}
-								selectedFlavors={selectedFlavors}
-								setSelectedFlavors={setSelectedFlavors}
-							/>
+
+							{/* Stats Card - Mobile Version */}
+							{stores && stores.length > 0 && (
+								<StatsCardMobile
+									stores={stores}
+									center={location}
+									radius={radius}
+								/>
+							)}
+
+							{/* Filters - collapsed on mobile by default */}
+							<Card className="p-4 bg-white/70 dark:bg-slate-900/70 shadow-sm border border-slate-200/50 dark:border-slate-800/50">
+								<Collapsible defaultOpen={false}>
+									<CollapsibleTrigger className="w-full flex items-center gap-2 text-left">
+										<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+										<span className="font-medium text-slate-900 dark:text-slate-100">
+											Filtres de recherche
+										</span>
+									</CollapsibleTrigger>
+
+									<CollapsibleContent className="space-y-4 mt-4">
+										{/* Only Available */}
+										<div className="flex items-center justify-between bg-slate-100/50 dark:bg-slate-800/50 p-3 rounded-lg">
+											<div>
+												<p className="font-medium text-slate-900 dark:text-slate-100">
+													Produits disponibles uniquement
+												</p>
+												<p className="text-xs text-slate-500 dark:text-slate-400">
+													Afficher seulement les magasins avec stock
+												</p>
+											</div>
+											<Switch
+												className="ml-2"
+												checked={onlyAvailable}
+												onCheckedChange={setOnlyAvailable}
+											/>
+										</div>
+
+										{/* Radius */}
+										<div className="space-y-2">
+											<label className="block font-medium">
+												Rayon de recherche : {formatNumber(radius / 1000)} km
+											</label>
+											<Slider
+												min={100}
+												max={5000}
+												step={100}
+												value={[radius]}
+												onValueChange={(v) => setRadius(v[0])}
+												className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
+											/>
+											<div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+												<span>100m</span>
+												<span>5km</span>
+											</div>
+										</div>
+
+										{/* Flavors */}
+										<div className="space-y-1">
+											<label className="block font-medium">
+												Saveurs préférées
+											</label>
+											<div className="relative z-[60]">
+												{" "}
+												{/* fix dropdown overlapping issue */}
+												<FlavorSelector
+													selectedFlavors={selectedFlavors}
+													setSelectedFlavors={setSelectedFlavors}
+												/>
+											</div>
+										</div>
+									</CollapsibleContent>
+								</Collapsible>
+							</Card>
+
+							{/* Store List */}
 							<div className="space-y-4">
 								<StoreList stores={stores} loading={loading} />
 								<StorePagination
