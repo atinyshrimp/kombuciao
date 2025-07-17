@@ -1,14 +1,19 @@
-export interface ParsedHours {
-	day: string;
-	dayFrench: string;
+import OpeningHours from "opening_hours";
+
+interface TimeRange {
 	open: string;
 	close: string;
+}
+
+export interface ParsedHours {
+	day: string;
+	isOpen: boolean;
+	timeRanges: TimeRange[];
 }
 
 export interface OpeningStatus {
 	isOpen: boolean;
 	status: string;
-	nextChange?: string;
 }
 
 // French day names
@@ -22,65 +27,50 @@ const FRENCH_DAYS: Record<string, string> = {
 	Sun: "Dimanche",
 };
 
-// Support multiple day abbreviation formats
-const DAY_MAPPINGS: Record<string, string> = {
-	Mo: "Mon",
-	Tu: "Tue",
-	We: "Wed",
-	Th: "Thu",
-	Fr: "Fri",
-	Sa: "Sat",
-	Su: "Sun",
-	Lun: "Mon",
-	Mar: "Tue",
-	Mer: "Wed",
-	Jeu: "Thu",
-	Ven: "Fri",
-	Sam: "Sat",
-	Dim: "Sun",
-};
-
 export function parseOpeningHours(openingHours: string): ParsedHours[] {
 	if (!openingHours || openingHours.trim() === "") return [];
 
 	try {
-		// Handle formats like "Mon-Fri 9-18", "Mon-Fri 09:00-18:00", "Mon 9-17; Tue-Fri 8-19"
-		const schedules = openingHours.split(";").map((s) => s.trim());
-		const parsed: ParsedHours[] = [];
+		const parsed = [];
+		for (const dayFrench of Object.values(FRENCH_DAYS)) {
+			parsed.push({
+				day: dayFrench,
+				isOpen: false,
+				timeRanges: [] as TimeRange[],
+			});
+		}
 
-		for (const schedule of schedules) {
-			const parts = schedule.split(" ");
-			if (parts.length < 2) continue;
+		const oh = new OpeningHours(openingHours);
 
-			const dayRange = parts[0];
-			const timeRange = parts.slice(1).join(" ");
+		const thisMonday = new Date();
+		thisMonday.setDate(thisMonday.getDate() - thisMonday.getDay() + 1);
+		thisMonday.setHours(0, 0, 0, 0);
 
-			// Parse time range
-			const timeMatch = timeRange.match(
-				/(\d{1,2}):?(\d{0,2})-(\d{1,2}):?(\d{0,2})/
-			);
-			if (!timeMatch) continue;
+		const thisSunday = new Date();
+		thisSunday.setDate(thisSunday.getDate() - thisSunday.getDay() + 7);
+		thisSunday.setHours(23, 59, 59, 999);
 
-			const [, startH, startM = "00", endH, endM = "00"] = timeMatch;
-			const open = `${startH.padStart(2, "0")}:${startM.padStart(2, "0")}`;
-			const close = `${endH.padStart(2, "0")}:${endM.padStart(2, "0")}`;
+		const openedIntervals = oh.getOpenIntervals(thisMonday, thisSunday);
 
-			// Parse day range
-			if (dayRange.includes("-")) {
-				const [start, end] = dayRange.split("-");
-				const days = expandDayRange(start, end);
-				days.forEach((day) => {
-					parsed.push({ day, dayFrench: FRENCH_DAYS[day] || day, open, close });
-				});
-			} else {
-				const normalizedDay = DAY_MAPPINGS[dayRange] || dayRange;
-				parsed.push({
-					day: normalizedDay,
-					dayFrench: FRENCH_DAYS[normalizedDay] || normalizedDay,
-					open,
-					close,
-				});
-			}
+		for (const interval of openedIntervals) {
+			let index = new Date(interval[0]).getDay();
+			if (index === 0) index = 6;
+			else index--;
+
+			const day = parsed[index];
+			if (!day) continue;
+
+			day.isOpen = true;
+			day.timeRanges.push({
+				open: new Date(interval[0]).toLocaleTimeString("fr-FR", {
+					hour: "2-digit",
+					minute: "2-digit",
+				}),
+				close: new Date(interval[1]).toLocaleTimeString("fr-FR", {
+					hour: "2-digit",
+					minute: "2-digit",
+				}),
+			});
 		}
 
 		return parsed;
@@ -90,98 +80,87 @@ export function parseOpeningHours(openingHours: string): ParsedHours[] {
 	}
 }
 
-function expandDayRange(start: string, end: string): string[] {
-	const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-
-	// Normalize day abbreviations
-	const normalizedStart = DAY_MAPPINGS[start] || start;
-	const normalizedEnd = DAY_MAPPINGS[end] || end;
-
-	const startIndex = days.indexOf(normalizedStart);
-	const endIndex = days.indexOf(normalizedEnd);
-
-	if (startIndex === -1 || endIndex === -1) return [normalizedStart];
-
-	const result: string[] = [];
-	for (let i = startIndex; i <= endIndex; i++) {
-		result.push(days[i]);
-	}
-	return result;
-}
-
 export function getOpeningStatus(openingHours: string): OpeningStatus {
-	const parsed = parseOpeningHours(openingHours);
-
-	if (parsed.length === 0) {
+	if (!openingHours || openingHours.trim() === "") {
 		return {
 			isOpen: false,
 			status: "Horaires inconnus",
 		};
 	}
 
-	const now = new Date();
-	const currentDay = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
-		now.getDay()
-	];
-	const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now
-		.getMinutes()
-		.toString()
-		.padStart(2, "0")}`;
+	try {
+		const oh = new OpeningHours(openingHours);
+		const now = new Date();
 
-	// Find today's hours
-	const todayHours = parsed.find((h) => h.day === currentDay);
+		// Check if currently open
+		const isOpen = oh.getState(now);
 
-	if (!todayHours) {
+		if (isOpen) {
+			// Get next closing time
+			const nextChange = oh.getNextChange(now);
+			if (nextChange) {
+				const closeTime = nextChange.toLocaleTimeString("fr-FR", {
+					hour: "2-digit",
+					minute: "2-digit",
+				});
+
+				return {
+					isOpen: true,
+					status: `Ouvert jusqu'à ${closeTime}`,
+				};
+			} else {
+				return {
+					isOpen: true,
+					status: "Ouvert",
+				};
+			}
+		} else {
+			// Get next opening time
+			const nextChange = oh.getNextChange(now);
+			if (nextChange) {
+				const openTime = nextChange.toLocaleTimeString("fr-FR", {
+					hour: "2-digit",
+					minute: "2-digit",
+				});
+
+				// Get the day name for the next opening
+				const dayNames = [
+					"Dimanche",
+					"Lundi",
+					"Mardi",
+					"Mercredi",
+					"Jeudi",
+					"Vendredi",
+					"Samedi",
+				];
+
+				const tomorrow = new Date(now);
+				tomorrow.setDate(tomorrow.getDate() + 1);
+
+				// Check if it's today or another day
+				const isToday = nextChange.toDateString() === now.toDateString();
+				const isTomorrow =
+					nextChange.toDateString() === tomorrow.toDateString();
+				let nextDayName = dayNames[nextChange.getDay()].toLowerCase();
+				if (isToday) nextDayName = "";
+				if (isTomorrow) nextDayName = "demain";
+
+				return {
+					isOpen: false,
+					status: `Ouvre ${nextDayName} à ${openTime}`,
+				};
+			} else {
+				return {
+					isOpen: false,
+					status: "Fermé",
+				};
+			}
+		}
+	} catch (error) {
+		console.warn("Failed to parse opening hours:", openingHours, error);
 		return {
 			isOpen: false,
-			status: "Fermé aujourd'hui",
+			status: "Horaires inconnus",
 		};
 	}
-
-	// Check if currently open
-	const isCurrentlyOpen =
-		currentTime >= todayHours.open && currentTime <= todayHours.close;
-
-	if (isCurrentlyOpen) {
-		return {
-			isOpen: true,
-			status: `Ouvert jusqu'à ${todayHours.close}`,
-			nextChange: todayHours.close,
-		};
-	} else if (currentTime < todayHours.open) {
-		return {
-			isOpen: false,
-			status: `Ouvre à ${todayHours.open}`,
-			nextChange: todayHours.open,
-		};
-	} else {
-		// Find next opening day
-		const nextDay = findNextOpeningDay(parsed, currentDay);
-		return {
-			isOpen: false,
-			status: nextDay
-				? `Ouvre ${nextDay.dayFrench} à ${nextDay.open}`
-				: "Fermé",
-			nextChange: nextDay?.open,
-		};
-	}
-}
-
-function findNextOpeningDay(
-	parsed: ParsedHours[],
-	currentDay: string
-): ParsedHours | null {
-	const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-	const currentIndex = days.indexOf(currentDay);
-
-	// Check next 7 days
-	for (let i = 1; i <= 7; i++) {
-		const nextDayIndex = (currentIndex + i) % 7;
-		const nextDay = days[nextDayIndex];
-		const nextDayHours = parsed.find((h) => h.day === nextDay);
-
-		if (nextDayHours) return nextDayHours;
-	}
-
-	return null;
 }

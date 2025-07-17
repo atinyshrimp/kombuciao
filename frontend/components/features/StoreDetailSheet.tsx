@@ -130,6 +130,7 @@ export default function StoreDetailSheet({
 
 	const openingStatus = getOpeningStatus(store.openingHours || "");
 	const parsedHours = parseOpeningHours(store.openingHours || "");
+	console.log(parsedHours);
 
 	return (
 		<>
@@ -218,16 +219,28 @@ export default function StoreDetailSheet({
 
 									{parsedHours.length > 0 ? (
 										<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 space-y-2 border border-slate-200/40 dark:border-slate-700/40">
-											{parsedHours.map((hours, index) => (
+											{parsedHours.map((schedule, index) => (
 												<div
 													key={index}
 													className="flex justify-between items-center text-sm">
 													<span className="font-medium text-slate-700 dark:text-slate-300">
-														{hours.dayFrench}
+														{schedule.day}
 													</span>
-													<span className="text-slate-600 dark:text-slate-400">
-														{hours.open} - {hours.close}
-													</span>
+													{schedule.isOpen && (
+														<span className="text-slate-600 dark:text-slate-400">
+															{schedule.timeRanges
+																.map(
+																	(timeRange) =>
+																		`${timeRange.open} - ${timeRange.close}`
+																)
+																.join(" | ")}
+														</span>
+													)}
+													{!schedule.isOpen && (
+														<span className="text-red-600 dark:text-red-400">
+															Fermé
+														</span>
+													)}
 												</div>
 											))}
 										</div>
