@@ -48,6 +48,10 @@ export default function StoreDetailSheet({
 		if (selectedStore) {
 			fetchStore();
 			fetchReports();
+		} else {
+			// Reset state when selectedStore becomes null
+			setStore(null);
+			setReports([]);
 		}
 	}, [selectedStore]);
 
@@ -81,9 +85,6 @@ export default function StoreDetailSheet({
 	};
 
 	const isOpen = Boolean(selectedStore);
-
-	if (!selectedStore) return null;
-
 	// Show loading state while store data is being fetched
 	if (!store) {
 		return (
@@ -136,9 +137,11 @@ export default function StoreDetailSheet({
 		<>
 			<Sheet
 				open={isOpen}
-				onOpenChange={() => {
-					setSelectedStore(null);
-					if (isEdited) fetchStores();
+				onOpenChange={(open) => {
+					if (!open) {
+						setSelectedStore(null);
+						if (isEdited) fetchStores();
+					}
 				}}>
 				<SheetContent
 					side="right"

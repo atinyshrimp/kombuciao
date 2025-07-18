@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+	createContext,
+	useContext,
+	useState,
+	ReactNode,
+	useEffect,
+} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface StoreContextType {
@@ -17,11 +23,24 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
-	// Get selected store from URL parameters
-	const selectedStore = searchParams.get("storeId");
+	// Use state to prevent selectedStore from being reset by URL updates
+	const [selectedStore, setSelectedStoreState] = useState<string | null>(
+		searchParams.get("storeId")
+	);
+
+	// Initialize selectedStore from URL on first render only
+	useEffect(() => {
+		const storeIdFromUrl = searchParams.get("storeId");
+		if (storeIdFromUrl) {
+			setSelectedStoreState(storeIdFromUrl);
+		}
+	}, []); // Empty dependency array means this runs once on mount
 
 	// Update URL when store is selected/deselected
 	const setSelectedStore = (id: string | null) => {
+		setSelectedStoreState(id); // Update state first
+
+		// Then update URL
 		const params = new URLSearchParams(searchParams);
 
 		if (id) params.set("storeId", id);
