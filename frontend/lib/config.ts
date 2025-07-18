@@ -25,7 +25,7 @@ const getApiURL = () => {
 			typeof window !== "undefined" ? window.location.hostname : "localhost";
 		return `http://${hostname}:8080`;
 	}
-	if (environment === "production") return "http://localhost:8080";
+	if (environment === "production") return "https://kombuciao-api.vercel.app";
 	return "";
 };
 
