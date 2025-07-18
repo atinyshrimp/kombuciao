@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Heart, Milk } from "lucide-react";
+import Link from "next/link";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -95,21 +96,21 @@ export default function RootLayout({
 
 								{/* Links */}
 								<div className="flex items-center gap-6 text-xs">
-									<a
-										href="#"
+									<Link
+										href="/about"
 										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
 										À propos
-									</a>
-									<a
-										href="#"
+									</Link>
+									<Link
+										href="/contact"
 										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
 										Contact
-									</a>
-									<a
-										href="#"
+									</Link>
+									<Link
+										href="/legal"
 										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
 										Mentions légales
-									</a>
+									</Link>
 								</div>
 
 								{/* Bottom */}
