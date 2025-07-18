@@ -5,6 +5,7 @@ import { Toaster } from "sonner";
 import { Milk } from "lucide-react";
 import Link from "next/link";
 import { CIAO_KOMBUCHA_URL } from "@/constants";
+import { Suspense } from "react";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -85,7 +86,9 @@ export default function RootLayout({
 					</header>
 
 					{/* Main Content */}
-					<main className="flex-1 container mx-auto px-4 py-6">{children}</main>
+					<main className="flex-1 container mx-auto px-4 py-6">
+						<Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+					</main>
 
 					{/* Footer */}
 					<footer className="border-t border-slate-200/60 bg-white/60 backdrop-blur-sm dark:border-slate-800/60 dark:bg-slate-950/60">
