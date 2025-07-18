@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import { Heart, Milk } from "lucide-react";
+import { Milk } from "lucide-react";
 import Link from "next/link";
+import { CIAO_KOMBUCHA_URL } from "@/constants";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -82,15 +83,17 @@ export default function RootLayout({
 							<div className="flex flex-col items-center gap-6 text-center">
 								{/* Main Footer Content */}
 								<div className="flex flex-col items-center gap-4">
-									<div className="flex items-center gap-2">
-										<Heart className="w-4 h-4 text-rose-500" />
-										<span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-											Fait avec amour pour les amateurs de Kombucha
-										</span>
-									</div>
 									<p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
-										Découvrez où trouver votre Ciao Kombucha préféré. Localisez
-										les magasins avec les saveurs disponibles en temps réel.
+										Découvrez où trouver votre{" "}
+										<a
+											href={CIAO_KOMBUCHA_URL}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-emerald-500 italic hover:text-emerald-600 transition-colors">
+											Ciao Kombucha
+										</a>
+										. Localisez les magasins avec les saveurs disponibles en
+										temps réel.
 									</p>
 								</div>
 
@@ -113,11 +116,12 @@ export default function RootLayout({
 									</Link>
 								</div>
 
-								{/* Bottom */}
-								<div className="pt-4 border-t border-slate-200/60 dark:border-slate-800/60 w-full">
-									<p className="text-xs text-slate-400 dark:text-slate-500">
-										© {new Date().getFullYear()} Kombuciao. Tous droits
-										réservés.
+								{/* License Info */}
+								<div className="text-xs text-slate-400 dark:text-slate-500 space-y-1">
+									<p>Kombuciao</p>
+									<p>
+										Licence Polyform Noncommercial 1.0.0 • Usage non commercial
+										uniquement
 									</p>
 								</div>
 							</div>
