@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { ALLOWED_TYPES } from "@/constants";
+import { v4 as uuidv4 } from "uuid";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -22,7 +23,7 @@ export function getUserId() {
 	const userIdKey = "kombuciao-user-id";
 	let userId = localStorage.getItem(userIdKey);
 	if (!userId) {
-		userId = crypto.randomUUID();
+		userId = uuidv4();
 		localStorage.setItem(userIdKey, userId);
 	}
 	return userId;
