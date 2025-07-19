@@ -68,7 +68,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 					{/* Store Name and Distance */}
 					<div className="flex items-start justify-between gap-2 mb-2">
 						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 line-clamp-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
-							{store.name}
+							{store.name || "Sans nom"}
 						</h3>
 						<div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/80 px-2 py-1 rounded-full">
 							<MapPin className="w-3 h-3" />

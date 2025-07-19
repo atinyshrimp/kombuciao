@@ -11,7 +11,6 @@ export interface Store {
 	name: string;
 	address: {
 		street: string;
-		postCode?: string;
 		city: string;
 	};
 	location: {

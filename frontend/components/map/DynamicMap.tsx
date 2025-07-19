@@ -243,7 +243,7 @@ export default function DynamicMap({
 				const popupContent = `
 					<div class="store-popup">
 						<div class="store-popup-header">
-							<h3 class="store-popup-title">${store.name}</h3>
+							<h3 class="store-popup-title">${store.name || "Sans nom"}</h3>
 							<div class="store-popup-meta">
 								${
 									store.types && store.types.length > 0
@@ -297,9 +297,7 @@ export default function DynamicMap({
 									<div class="store-popup-address-street">${
 										store.address.street || "Adresse non disponible"
 									}</div>
-									<div class="store-popup-address-city">${store.address.postCode || ""} ${
-					store.address.city || ""
-				}</div>
+									<div class="store-popup-address-city">${store.address.city || ""}</div>
 								</div>
 							</div>
 						</div>

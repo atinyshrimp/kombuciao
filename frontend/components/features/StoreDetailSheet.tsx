@@ -154,7 +154,7 @@ export default function StoreDetailSheet({
 							<div className="flex items-start justify-between mb-4">
 								<div className="flex-1 min-w-0">
 									<SheetTitle className="text-white text-xl font-bold mb-2 line-clamp-2">
-										{store.name}
+										{store.name || "Sans nom"}
 									</SheetTitle>
 									<div className="flex items-center gap-2 text-white/90 text-sm">
 										<MapPin className="h-4 w-4 flex-shrink-0" />
@@ -386,7 +386,7 @@ const VoteButtons = ({
 		const isActionConfirmed = window.confirm(
 			`Voulez-vous vraiment ${
 				type === "confirm" ? "confirmer" : "contester"
-			} le signalement pour ${report.store.name} ?`
+			} le signalement pour le magasin "${report.store.name || "Sans nom"}" ?`
 		);
 		if (!isActionConfirmed) return;
 
@@ -399,7 +399,9 @@ const VoteButtons = ({
 			toast.success(
 				`Vote de ${
 					type === "confirm" ? "confirmation" : "contestation"
-				} enregistré avec succès pour ${report.store.name}`
+				} enregistré avec succès pour le magasin "${
+					report.store.name || "Sans nom"
+				}"`
 			);
 		} catch (error) {
 			console.error("Error voting:", error);
@@ -561,8 +563,8 @@ const CreateReportModal = ({
 					</DialogTitle>
 				</DialogHeader>
 				<DialogDescription className="text-slate-600 dark:text-slate-400">
-					Signaler la disponibilité de kombucha chez {store.name} à{" "}
-					{store.address.city}
+					Signaler la disponibilité de kombucha chez {store.name || "Sans nom"}
+					{store.address.city && ` à ${store.address.city}`}
 				</DialogDescription>
 				<div className="space-y-4">
 					<div className="space-y-2">
