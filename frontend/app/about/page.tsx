@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Heart, MapPin, Users, Code, Database, Vote } from "lucide-react";
 import Link from "next/link";
-import { CIAO_KOMBUCHA_URL } from "@/constants";
+import { CIAO_KOMBUCHA_URL, REPO_URL } from "@/constants";
 
 export const metadata: Metadata = {
 	title: "À propos - Kombuciao",
@@ -115,8 +115,15 @@ export default function AboutPage() {
 					</div>
 					<p className="text-slate-600 dark:text-slate-400">
 						Kombuciao est un projet <i>source-available</i> sous licence
-						Polyform Noncommercial 1.0.0. Le code source est disponible sur
-						GitHub et les contributions sont les bienvenues.
+						Polyform Noncommercial 1.0.0. Le code source est disponible sur{" "}
+						<a
+							href={REPO_URL}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-purple-500 hover:text-purple-600 transition-colors">
+							GitHub
+						</a>{" "}
+						et les contributions sont les bienvenues.
 					</p>
 				</div>
 			</div>
