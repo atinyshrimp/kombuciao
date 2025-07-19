@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 		countryName: "France",
 		images: [
 			{
-				url: "/images/og-image.png",
+				url: "/og-image.png",
 				width: 1200,
 				height: 630,
 				alt: "Kombuciao - Trouvez votre Ciao Kombucha",
