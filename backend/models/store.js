@@ -11,6 +11,13 @@ const StoreSchema = new mongoose.Schema(
 		},
 		openingHours: { type: String, default: "" }, // e.g., "Mon-Fri 9-18"
 		types: { type: [String], default: [] }, // e.g., ["cafe", "shop"]
+		osmId: {
+			type: String,
+			index: true,
+			unique: true,
+			required: true,
+			default: "",
+		}, // e.g., "node/2659184738"
 	},
 	{ timestamps: true }
 );

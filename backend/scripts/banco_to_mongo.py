@@ -37,7 +37,7 @@ COLL_NAME = "stores"
 BULK_SIZE = 1000  # docs per bulkWrite
 
 DROP_COLS = [
-    "osm_id", "wheelchair", "level", "siret", "profession_ref",
+    "wheelchair", "level", "siret", "profession_ref",
     "wikidata", "website", "phone", "email", "facebook", "com_insee"
 ]
 
@@ -75,12 +75,6 @@ with tempfile.TemporaryDirectory() as tmpdir:
 client = MongoClient(f"{MONGO_URI}&tlsAllowInvalidCertificates=true")
 coll   = client[DB_NAME][COLL_NAME]
 
-# compound unique index (create once)
-coll.create_index(
-    [("name", ASCENDING), ("location.coordinates", ASCENDING)],
-    unique=True, name="uniq_name_coords"
-)
-
 # 5️⃣ BUILD BULK UPSERTS ------------------------------------------------------
 
 def row_to_update(row):
@@ -90,8 +84,12 @@ def row_to_update(row):
         return None
     if math.isnan(lon) or math.isnan(lat):
         return None
+    
+    osm_id = row.get("osm_id", None)
+    if not osm_id or osm_id == "" or pd.isna(osm_id):
+        return None
 
-    update_filter = {"location.coordinates": [lon, lat]}
+    update_filter = {"osmId": osm_id}
     existing = coll.find_one(update_filter)
 
     # Skip if the document is already up to date
@@ -99,7 +97,7 @@ def row_to_update(row):
         return None
 
     name = row.get("name", "Unnamed") or row.get("brand", "Unnamed")
-    if name is None:
+    if name is None or name == "" or pd.isna(name) or not name.strip():
         name = "Unnamed"
     address = {
         "street": row.get("address", ""),
@@ -107,7 +105,7 @@ def row_to_update(row):
     }
     types = [type.strip() for type in row.get("type", "").lower().split(";")]
     opening_hours = row.get("opening_hours", "")
-    if opening_hours is None:
+    if opening_hours is None or pd.isna(opening_hours) or not opening_hours.strip():
         opening_hours = ""
 
     now = datetime.now()
@@ -119,6 +117,7 @@ def row_to_update(row):
             "type": "Point",
             "coordinates": [lon, lat]
         },
+        "osmId": osm_id,
         "openingHours": opening_hours,
         "types": types,
         "updatedAt": now,
