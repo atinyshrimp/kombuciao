@@ -16,6 +16,7 @@ Environment variables required:
 """
 
 import os, io, zipfile, tempfile, requests, sys, math
+from datetime import datetime
 import pandas as pd
 from tqdm import tqdm
 from pymongo import MongoClient, UpdateOne, ASCENDING
@@ -30,7 +31,7 @@ ALLOWED_TYPES = {"supermarket", "convenience", "grocery", "organic"}
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
-DB_NAME   = "test"
+DB_NAME   = "prod"
 COLL_NAME = "stores"
 
 BULK_SIZE = 1000  # docs per bulkWrite
@@ -90,12 +91,26 @@ def row_to_update(row):
     if math.isnan(lon) or math.isnan(lat):
         return None
 
-    name = row.get("name") or row.get("brand") or "Unnamed"
+    update_filter = {"location.coordinates": [lon, lat]}
+    existing = coll.find_one(update_filter)
+
+    # Skip if the document is already up to date
+    if existing and datetime.strptime(row["last_update"], "%Y-%m-%d") < existing["updatedAt"]:
+        return None
+
+    name = row.get("name", "Unnamed") or row.get("brand", "Unnamed")
+    if name is None:
+        name = "Unnamed"
     address = {
-        "street": row.get("street", ""),
-        "city": row.get("city", ""),
+        "street": row.get("address", ""),
+        "city": row.get("com_nom", ""),
     }
     types = [type.strip() for type in row.get("type", "").lower().split(";")]
+    opening_hours = row.get("opening_hours", "")
+    if opening_hours is None:
+        opening_hours = ""
+
+    now = datetime.now()
 
     doc = {
         "name": name,
@@ -104,12 +119,17 @@ def row_to_update(row):
             "type": "Point",
             "coordinates": [lon, lat]
         },
-        "openingHours": row.get("opening_hours", ""),
+        "openingHours": opening_hours,
         "types": types,
+        "updatedAt": now,
     }
+    
+    # Set createdAt only for new documents
+    if not existing:
+        doc["createdAt"] = now
 
     return UpdateOne(
-        {"name": name, "location.coordinates": [lon, lat]},
+        update_filter,
         {"$set": doc},
         upsert=True
     )
