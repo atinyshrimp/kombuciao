@@ -1,8 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kombuciao Frontend
 
-## Getting Started
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-38B2AC.svg?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
-First, run the development server:
+A _source-available_ platform to locate stores selling Ciao Kombucha near you.
+
+## 🍃 About
+
+Kombuciao is a web application that helps you quickly find where to buy Ciao Kombucha. The application uses geolocation to show you nearby stores with available flavors.
+
+## ✨ Features
+
+- 🗺️ **Interactive map** with geolocation
+- 🔍 **Address or city search**
+- 🏪 **Filtering by available flavors**
+- 📱 **Responsive interface** for mobile and desktop
+- ⚡ **Real-time data** on availability
+- 👥 **Community reporting system**
+- 🗳️ **Voting on reports** to maintain reliability
+
+## 📊 Data Sources
+
+### Stores
+
+Store information comes from the [Base Nationale des Commerces Ouverte (BANCO)](https://www.data.gouv.fr/datasets/base-nationale-des-commerces-ouverte/), a French public database. **I cannot modify this data directly.**
+
+### Flavor Availability
+
+Information about flavor availability is based on community reports. Each user can:
+
+- Report flavor availability at a store
+- Vote on existing reports
+- Contribute to maintaining reliable information
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm or bun
+
+### Installation
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/atinyshrimp/kombuciao.git
+cd kombuciao/frontend
+```
+
+2. **Install dependencies:**
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. **Start the development server:**
 
 ```bash
 npm run dev
@@ -10,27 +69,63 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Technologies Used
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS
+- **Maps**: Leaflet
+- **UI Components**: shadcn/ui
+- **Icons**: Lucide React
+- **Notifications**: Sonner
 
-## Learn More
+## 📄 License
 
-To learn more about Next.js, take a look at the following resources:
+This project is distributed under the **Polyform Noncommercial 1.0.0** license.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Permitted Use (Non-commercial):
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- ✅ Personal and educational use
+- ✅ Open source development contributions
+- ✅ Non-commercial research and development
+- ✅ Use by non-profit organizations
 
-## Deploy on Vercel
+### Prohibited Use (Commercial):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- ❌ Use in a commercial context
+- ❌ Integration into paid products or services
+- ❌ Use by for-profit companies
+- ❌ Direct or indirect monetization
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For commercial use, please contact us.
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'feat: add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Community Engagement
+
+Kombuciao's relevance depends on community engagement. You can contribute by:
+
+- Reporting flavor availability at stores
+- Voting on existing reports
+- Reporting bugs or suggesting improvements
+- Contributing to the source code
+
+## 📞 Contact
+
+- **GitHub**: [Issues](https://github.com/atinyshrimp/kombuciao/issues)
+- **Website**: [kombuciao.com](https://kombuciao.com)
+
+---
+
+Made with ❤️ for the Squeezos

@@ -1,15 +1,22 @@
-# Kombucha Backend
+# Kombuciao Backend
 
-A Node.js backend application for managing store data with MongoDB integration and Python data import scripts.
+[![Node.js](https://img.shields.io/badge/Node.js-14+-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
+[![Express.js](https://img.shields.io/badge/Express.js-5.1.0-black.svg?style=for-the-badge&logo=express)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
+[![Mongoose](https://img.shields.io/badge/Mongoose-8.16.1-orange.svg?style=for-the-badge)](https://mongoosejs.com/)
+[![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
+
+A Node.js backend application for managing store data with MongoDB integration, Python data import scripts, and community-driven flavor availability reporting.
 
 ## Overview
 
 This backend provides:
 
 - Store data management with MongoDB
-- Geospatial queries for store locations  
+- Geospatial queries for store locations
+- Community-driven flavor availability reporting system
 - Python script for importing French commercial data (BANCO database)
-- RESTful API endpoints for store operations
+- RESTful API endpoints for store and report operations
 - CORS support for frontend integration
 
 ## Prerequisites
@@ -34,7 +41,7 @@ Create a `.env` file in the backend directory with your MongoDB connection strin
 ```env
 MONGODB_URI="your_mongodb_connection_string"
 PORT=8080
-NODE_ENV=development
+NODE_ENV="development"
 ```
 
 ### 3. Python Environment Setup (for Data Import)
@@ -63,14 +70,16 @@ backend/
 │   ├── index.js           # Configuration management
 │   └── db.js              # Database connection
 ├── controllers/
-│   └── store.js           # Store business logic (implemented)
+│   ├── store.js           # Store business logic
+│   └── report.js          # Report business logic
 ├── models/
-│   └── store.js           # Store MongoDB schema
+│   ├── store.js           # Store MongoDB schema
+│   └── report.js          # Report MongoDB schema
 ├── routes/
-│   └── store.js           # Store API routes (implemented)
+│   ├── store.js           # Store API routes
+│   └── report.js          # Report API routes
 ├── scripts/
 │   └── banco_to_mongo.py  # Python data import script
-├── utils/                 # Utility functions
 ├── .env                   # Environment variables
 ├── .gitignore            # Git ignore rules
 ├── requirements.txt      # Python dependencies
@@ -103,14 +112,7 @@ The Python script [`banco_to_mongo.py`](scripts/banco_to_mongo.py) imports Frenc
    source venv/bin/activate
    ```
 
-2. **Set environment variables (same as Node.js app):**
-
-   ```bash
-   # The script uses the same MONGODB_URI
-   # Database: "test", Collection: "stores" (hardcoded in script)
-   ```
-
-3. **Run the import script:**
+2. **Run the import script:**
    ```bash
    python scripts/banco_to_mongo.py
    ```
@@ -123,6 +125,8 @@ The script will:
 - Create unique indexes to prevent duplicates (name + coordinates)
 
 ## Database Schema
+
+### Store Model
 
 The [`Store`](models/store.js) model includes:
 
@@ -139,6 +143,26 @@ The [`Store`](models/store.js) model includes:
     coordinates: [longitude, latitude] // [lng, lat]
   },
   openingHours: String,              // e.g., "Mon-Fri 9-18"
+  types: [String],                   // e.g., ["supermarket", "organic"]
+  createdAt: Date,                   // Auto-generated
+  updatedAt: Date                    // Auto-generated
+}
+```
+
+### Report Model
+
+The [`Report`](models/report.js) model for community flavor availability:
+
+```javascript
+{
+  store: ObjectId (required),        // Reference to Store
+  flavors: [String],                 // Available flavors
+  description: String,               // Optional description
+  votes: [{
+    voterId: String (required),      // Anonymous voter ID
+    type: "confirm" | "deny",        // Vote type
+    createdAt: Date                  // Auto-generated
+  }],
   createdAt: Date,                   // Auto-generated
   updatedAt: Date                    // Auto-generated
 }
@@ -146,13 +170,22 @@ The [`Store`](models/store.js) model includes:
 
 ## API Endpoints
 
-All endpoints are fully implemented and available at `/stores`:
+### Store Endpoints (`/stores`)
 
 - `POST /stores` - Create a new store
 - `GET /stores` - List all stores (with optional geospatial filtering)
 - `GET /stores/:id` - Get a specific store by ID
 - `PUT /stores/:id` - Update a store
 - `DELETE /stores/:id` - Delete a store
+
+### Report Endpoints (`/reports`)
+
+- `POST /reports` - Create a new flavor availability report
+- `GET /reports` - List all reports (with optional filtering)
+- `GET /reports/:id` - Get a specific report
+- `POST /reports/:id/confirm` - Confirm a report
+- `POST /reports/:id/deny` - Deny a report
+- `DELETE /reports/:id` - Delete a report
 
 ### Geospatial Queries
 
@@ -164,6 +197,12 @@ GET /stores?lat=48.8566&lng=2.3522
 
 # Specify custom radius (in meters)
 GET /stores?lat=48.8566&lng=2.3522&radius=10000
+
+# Filter by flavor availability
+GET /stores?flavor=citron&flavor=peche
+
+# Only show stores with recent availability
+GET /stores?onlyAvailable=true
 
 # Pagination
 GET /stores?page=1&pageSize=20
@@ -179,26 +218,27 @@ curl -X POST http://localhost:8080/stores \
     "name": "Bio Market",
     "address": {"street": "123 Main St", "city": "Paris", "postcode": "75001"},
     "location": {"type": "Point", "coordinates": [2.3522, 48.8566]},
-    "openingHours": "Mon-Sat 9-19"
+    "openingHours": "Mon-Sat 9-19",
+    "types": ["organic", "supermarket"]
   }'
 
-# Get nearby stores
-curl "http://localhost:8080/stores?lat=48.8566&lng=2.3522&radius=5000"
+# Create a flavor availability report
+curl -X POST http://localhost:8080/reports \
+  -H "Content-Type: application/json" \
+  -d '{
+    "store": "store_id_here",
+    "flavors": ["citron", "peche", "fruits_rouges"],
+    "description": "Saw these flavors today!"
+  }'
+
+# Get nearby stores with flavor filtering
+curl "http://localhost:8080/stores?lat=48.8566&lng=2.3522&radius=5000&flavor=citron&onlyAvailable=true"
 ```
-
-## Development
-
-The application uses:
-
-- **Express.js** 5.1.0 for the web framework
-- **Mongoose** 8.16.1 for MongoDB ODM
-- **CORS** 2.8.5 for cross-origin requests
-- **dotenv** 17.0.0 for environment configuration
-- **nodemon** 3.1.10 (dev) for development auto-reload
 
 ## Dependencies
 
 ### Node.js Dependencies
+
 - `express` - Web framework
 - `mongoose` - MongoDB object modeling
 - `cors` - Cross-origin resource sharing
@@ -206,6 +246,7 @@ The application uses:
 - `nodemon` (dev) - Development auto-reload
 
 ### Python Dependencies
+
 - `pandas` - Data manipulation and CSV processing
 - `pymongo` - MongoDB Python driver
 - `tqdm` - Progress bars for data import
@@ -218,29 +259,43 @@ Required environment variables:
 ```env
 MONGODB_URI="mongodb://localhost:27017" # or your MongoDB Atlas connection string
 PORT=8080                               # Server port (optional, defaults to 8080)
-NODE_ENV=development                    # Environment mode (optional)
+NODE_ENV="development"                  # Environment mode (optional)
 ```
 
 ## Error Handling
 
 The API includes comprehensive error handling:
+
 - Input validation for required fields
 - Proper HTTP status codes
 - Detailed error messages
 - Global error handler for uncaught exceptions
 
+## Community Features
+
+The backend supports community-driven features:
+
+- **Flavor Availability Reports**: Users can report which flavors are available at specific stores
+- **Voting System**: Community members can confirm or deny reports to maintain data quality
+- **Anonymous Voting**: Uses voter IDs to prevent spam while maintaining privacy
+- **Filtering**: Frontend can filter stores based on recent availability reports
+
 ## Contributing
 
 The backend is fully functional with implemented:
+
 - ✅ Store CRUD operations
 - ✅ Geospatial queries with MongoDB
+- ✅ Community reporting system
 - ✅ Data import from BANCO database
 - ✅ Error handling and validation
 - ✅ CORS support for frontend integration
 
 Future enhancements could include:
+
 - Authentication and authorization
 - Rate limiting
 - Caching layer
 - Additional store metadata fields
 - Store categories and filtering
+- Report moderation tools
