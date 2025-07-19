@@ -96,9 +96,9 @@ def row_to_update(row):
     if existing and datetime.strptime(row["last_update"], "%Y-%m-%d") < existing["updatedAt"]:
         return None
 
-    name = row.get("name", "Unnamed") or row.get("brand", "Unnamed")
+    name = row.get("name", "Sans nom") or row.get("brand", "Sans nom")
     if name is None or name == "" or pd.isna(name) or not name.strip():
-        name = "Unnamed"
+        name = "Sans nom"
     address = {
         "street": row.get("address", ""),
         "city": row.get("com_nom", ""),
