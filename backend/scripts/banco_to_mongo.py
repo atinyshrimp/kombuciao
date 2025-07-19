@@ -20,11 +20,14 @@ import pandas as pd
 from tqdm import tqdm
 from pymongo import MongoClient, UpdateOne, ASCENDING
 from pymongo.errors import BulkWriteError
+from dotenv import load_dotenv
 
 # 1️⃣ CONFIG ------------------------------------------------------------------
 
 ZIP_URL = "https://www.data.gouv.fr/fr/datasets/r/3d612ad7-f726-4fe5-a353-bdf76c5a44c2"  # WGS84 CSV
 ALLOWED_TYPES = {"supermarket", "convenience", "grocery", "organic"}
+
+load_dotenv()
 
 MONGO_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017")
 DB_NAME   = "test"
@@ -68,7 +71,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
 
 # 4️⃣ CONNECT TO MONGO --------------------------------------------------------
 
-client = MongoClient(MONGO_URI)
+client = MongoClient(f"{MONGO_URI}&tlsAllowInvalidCertificates=true")
 coll   = client[DB_NAME][COLL_NAME]
 
 # compound unique index (create once)
