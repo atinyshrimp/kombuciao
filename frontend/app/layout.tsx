@@ -35,12 +35,21 @@ export const metadata: Metadata = {
 	],
 	openGraph: {
 		type: "website",
+		url: "https://kombuciao.vercel.app",
 		title: "Kombuciao - Trouvez votre Ciao Kombucha",
 		description:
 			"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
 		siteName: "Kombuciao",
 		locale: "fr_FR",
 		countryName: "France",
+		images: [
+			{
+				url: "/images/og-image.png",
+				width: 1200,
+				height: 630,
+				alt: "Kombuciao - Trouvez votre Ciao Kombucha",
+			},
+		],
 	},
 };
 
