@@ -1,11 +1,13 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import Link from "next/link";
 import { Toaster } from "sonner";
 import { Milk } from "lucide-react";
-import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
+
+import "./globals.css";
 import { CIAO_KOMBUCHA_URL } from "@/constants";
-import { Suspense } from "react";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -142,6 +144,7 @@ export default function RootLayout({
 					</footer>
 				</div>
 				<Toaster richColors position="top-center" />
+				<Analytics />
 			</body>
 		</html>
 	);
