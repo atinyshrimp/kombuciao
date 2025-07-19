@@ -11,6 +11,7 @@ import {
 	TbArrowBigDown,
 	TbArrowBigDownFilled,
 } from "react-icons/tb";
+import { SiOpenstreetmap, SiGooglemaps } from "react-icons/si";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Store, Report } from "@/types/store";
 import { FLAVORS, TYPES } from "@/constants";
@@ -195,6 +196,38 @@ export default function StoreDetailSheet({
 										{TYPES[store.types[0] as keyof typeof TYPES]}
 									</Badge>
 								)}
+							</div>
+
+							{/* Links */}
+							<div className="flex items-center gap-2 mt-3">
+								{store.osmId && (
+									<Button
+										variant="outline"
+										size="sm"
+										className="h-8 px-3 text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
+										onClick={() =>
+											window.open(
+												`https://www.openstreetmap.org/${store.osmId}`,
+												"_blank"
+											)
+										}>
+										<SiOpenstreetmap className="h-3 w-3 mr-1" />
+										Plus d&apos;infos
+									</Button>
+								)}
+								<Button
+									variant="outline"
+									size="sm"
+									className="h-8 px-3 text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
+									onClick={() => {
+										const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
+											store.location.coordinates.reverse().join(",")
+										)}`;
+										window.open(url, "_blank");
+									}}>
+									<SiGooglemaps className="h-3 w-3 mr-1" />
+									Itinéraire
+								</Button>
 							</div>
 						</div>
 					</div>

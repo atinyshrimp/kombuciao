@@ -23,7 +23,8 @@ export interface Store {
 	createdAt: string;
 	updatedAt: string;
 	distance?: number; // Distance in meters, optional for search results
-	types?: [string];
+	types: string[];
+	osmId: string; // e.g., "node/2659184738"
 	__v: number;
 }
 
