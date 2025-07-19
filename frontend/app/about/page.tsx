@@ -34,7 +34,7 @@ export default function AboutPage() {
 							href={CIAO_KOMBUCHA_URL}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-emerald-500 italic hover:text-emerald-600 transition-colors">
+							className="text-rose-500 italic hover:text-rose-600 transition-colors">
 							Ciao Kombucha
 						</a>{" "}
 						en vous permettant de localiser rapidement les magasins qui en
