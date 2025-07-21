@@ -556,7 +556,7 @@ const CreateReportModal = ({
 
 	return (
 		<Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-			<DialogContent className="px-4 lg:px-0 lg:max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
+			<DialogContent className="p-4 lg:max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
 				<DialogHeader>
 					<DialogTitle className="text-slate-900 dark:text-slate-100">
 						Créer un signalement
