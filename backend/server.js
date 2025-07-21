@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const connectDB = require("./config/db.js");
 const { PORT } = require("./config");
 
@@ -9,6 +10,8 @@ const reportRoutes = require("./routes/report.js");
 connectDB();
 
 const app = express();
+
+app.use(helmet());
 app.use(
 	cors({
 		origin: [
