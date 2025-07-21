@@ -124,8 +124,3 @@ Kombuciao's relevance depends on community engagement. You can contribute by:
 ## 📞 Contact
 
 - **GitHub**: [Issues](https://github.com/atinyshrimp/kombuciao/issues)
-- **Website**: [kombuciao.com](https://kombuciao.com)
-
----
-
-Made with ❤️ for the Squeezos

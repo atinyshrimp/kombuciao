@@ -206,6 +206,10 @@ kombuciao/
 - `onlyAvailable`: Only stores with recent availability
 - `page`, `pageSize`: Pagination
 
+## 🔒 API Security
+
+All API calls from the frontend to the backend are now securely proxied through Next.js API routes. These API routes inject the API key server-side, ensuring that secrets are never exposed to the browser. This setup guarantees secure communication between the frontend and backend, and prevents unauthorized access to protected endpoints.
+
 ## 🗄️ Database
 
 ### MongoDB Collections

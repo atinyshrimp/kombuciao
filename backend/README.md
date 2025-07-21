@@ -280,6 +280,10 @@ The backend supports community-driven features:
 - **Anonymous Voting**: Uses voter IDs to prevent spam while maintaining privacy
 - **Filtering**: Frontend can filter stores based on recent availability reports
 
+## 🔒 API Security
+
+The backend is now protected by API key authentication. All requests from the frontend are securely proxied through Next.js API routes, ensuring that the API key is never exposed to the browser and only authorized requests can access protected endpoints.
+
 ## Contributing
 
 The backend is fully functional with implemented:
@@ -290,10 +294,10 @@ The backend is fully functional with implemented:
 - ✅ Data import from BANCO database
 - ✅ Error handling and validation
 - ✅ CORS support for frontend integration
+- ✅ Authorization
 
 Future enhancements could include:
 
-- Authentication and authorization
 - Rate limiting
 - Caching layer
 - Additional store metadata fields
