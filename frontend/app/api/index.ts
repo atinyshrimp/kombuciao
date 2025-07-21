@@ -1,6 +1,4 @@
-import "isomorphic-fetch";
-
-import { apiURL } from "../config";
+const apiURL = "/api";
 
 interface ApiResponse {
 	ok: boolean;

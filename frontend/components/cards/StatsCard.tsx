@@ -13,7 +13,7 @@ import {
 	CollapsibleContent,
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import API from "@/lib/api";
+import API from "@/app/api";
 import { Store as StoreType } from "@/types/store";
 import { formatNumber } from "@/lib/utils";
 import { Card } from "../ui/card";

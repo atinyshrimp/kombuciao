@@ -19,7 +19,7 @@ import { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
 import { FLAVORS, PARIS_COORDINATES } from "@/constants";
-import api from "@/lib/api";
+import api from "@/app/api";
 import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
 import { StoreProvider } from "@/lib/store-context";

@@ -17,7 +17,7 @@ import { Store, Report } from "@/types/store";
 import { FLAVORS, TYPES } from "@/constants";
 import { useStoreContext } from "@/lib/store-context";
 import { getOpeningStatus, parseOpeningHours } from "@/lib/opening-hours";
-import api from "@/lib/api";
+import api from "@/app/api";
 import { cn, getDateString, getUserId } from "@/lib/utils";
 import { toast } from "sonner";
 import FlavorSelector from "./FlavorSelector";
