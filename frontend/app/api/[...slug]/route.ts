@@ -2,17 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:8080";
 
-export async function GET(
-	request: NextRequest,
-	{ params }: { params: { slug?: string[] } }
-) {
-	const slug = params.slug || [];
+export async function GET(request: NextRequest) {
+	const url = new URL(request.url);
+	const slug = url.pathname.replace("/api", "");
 	let endpoint = BACKEND_URL;
-	if (slug.length > 0) endpoint += "/" + slug.join("/");
+	if (slug.length > 0) endpoint += slug;
 
-	// Forward query string
-	const search = request.nextUrl.search;
-	endpoint += search;
+	const search = url.search;
+	if (search) endpoint += search;
 
 	const res = await fetch(endpoint, {
 		method: "GET",
@@ -24,16 +21,14 @@ export async function GET(
 	return NextResponse.json(data);
 }
 
-export async function POST(
-	request: NextRequest,
-	{ params }: { params: { slug?: string[] } }
-) {
-	const slug = params.slug || [];
+export async function POST(request: NextRequest) {
+	const url = new URL(request.url);
+	const slug = url.pathname.replace("/api", "");
 	let endpoint = BACKEND_URL;
-	if (slug.length > 0) endpoint += "/" + slug.join("/");
+	if (slug.length > 0) endpoint += slug;
 
-	const search = request.nextUrl.search;
-	endpoint += search;
+	const search = url.search;
+	if (search) endpoint += search;
 
 	const body = await request.json();
 	const res = await fetch(endpoint, {
@@ -48,16 +43,14 @@ export async function POST(
 	return NextResponse.json(data);
 }
 
-export async function PUT(
-	request: NextRequest,
-	{ params }: { params: { slug?: string[] } }
-) {
-	const slug = params.slug || [];
+export async function PUT(request: NextRequest) {
+	const url = new URL(request.url);
+	const slug = url.pathname.replace("/api", "");
 	let endpoint = BACKEND_URL;
-	if (slug.length > 0) endpoint += "/" + slug.join("/");
+	if (slug.length > 0) endpoint += slug;
 
-	const search = request.nextUrl.search;
-	endpoint += search;
+	const search = url.search;
+	if (search) endpoint += search;
 
 	const body = await request.json();
 	const res = await fetch(endpoint, {
@@ -72,16 +65,14 @@ export async function PUT(
 	return NextResponse.json(data);
 }
 
-export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: { slug?: string[] } }
-) {
-	const slug = params.slug || [];
+export async function DELETE(request: NextRequest) {
+	const url = new URL(request.url);
+	const slug = url.pathname.replace("/api", "");
 	let endpoint = BACKEND_URL;
-	if (slug.length > 0) endpoint += "/" + slug.join("/");
+	if (slug.length > 0) endpoint += slug;
 
-	const search = request.nextUrl.search;
-	endpoint += search;
+	const search = url.search;
+	if (search) endpoint += search;
 
 	const res = await fetch(endpoint, {
 		method: "DELETE",
