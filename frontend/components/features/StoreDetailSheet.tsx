@@ -556,7 +556,9 @@ const CreateReportModal = ({
 
 	return (
 		<Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-			<DialogContent className="p-4 lg:max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60">
+			<DialogContent
+				className="p-4 lg:max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-slate-200/60 dark:border-slate-800/60"
+				onOpenAutoFocus={(e) => e.preventDefault()}>
 				<DialogHeader>
 					<DialogTitle className="text-slate-900 dark:text-slate-100">
 						Créer un signalement
@@ -579,6 +581,7 @@ const CreateReportModal = ({
 							className="w-full max-h-20 p-3 rounded-xl border-slate-200/60 dark:border-slate-700/60 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-slate-900 dark:text-slate-100"
 							value={description}
 							onChange={(e) => setDescription(e.target.value)}
+							placeholder="Exemple : Sur la gauche de l'entrée, à côté du rayon des boissons..."
 						/>
 					</div>
 					<div className="space-y-2">
