@@ -1,4 +1,9 @@
+"use client";
+
+import { getUserId } from "@/lib/utils";
+
 const apiURL = "/api";
+const voterId = getUserId();
 
 interface ApiResponse {
 	ok: boolean;
@@ -41,6 +46,7 @@ class api {
 					headers: {
 						"Content-Type": "application/json",
 						Accept: "application/json",
+						"Kombuciao-Voter-Id": voterId,
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
@@ -63,6 +69,7 @@ class api {
 					headers: {
 						"Content-Type": "application/json",
 						Accept: "application/json",
+						"Kombuciao-Voter-Id": voterId,
 					},
 				});
 				const res = await response.json();
@@ -83,6 +90,7 @@ class api {
 					headers: {
 						"Content-Type": "application/json",
 						Accept: "application/json",
+						"Kombuciao-Voter-Id": voterId,
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
