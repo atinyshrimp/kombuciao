@@ -20,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Kombuciao | Où acheter Ciao Kombucha près de chez vous",
+	title: "Kombuciao | Où trouver du Ciao Kombucha près de chez vous",
 	description:
-		"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
+		"Découvrez où trouver votre Ciao Kombucha tant recherché près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
 	keywords: [
 		"kombuciao",
 		"où acheter ciao kombucha",
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 		url: "https://kombuciao.vercel.app",
 		title: "Kombuciao - Trouvez votre Ciao Kombucha",
 		description:
-			"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
+			"Découvrez où trouver votre Ciao Kombucha tant recherché près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
 		siteName: "Kombuciao",
 		locale: "fr_FR",
 		countryName: "France",
