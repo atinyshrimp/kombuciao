@@ -1,9 +1,6 @@
-"use client";
-
 import { getUserId } from "@/lib/utils";
 
 const apiURL = "/api";
-const voterId = getUserId();
 
 interface ApiResponse {
 	ok: boolean;
@@ -23,8 +20,7 @@ class api {
 					method: "GET",
 					credentials: "include",
 					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
+						"Kombuciao-Voter-Id": getUserId() || "",
 					},
 				});
 
@@ -44,9 +40,7 @@ class api {
 					method: "PUT",
 					credentials: "include",
 					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
-						"Kombuciao-Voter-Id": voterId,
+						"Kombuciao-Voter-Id": getUserId() || "",
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
@@ -67,9 +61,7 @@ class api {
 					credentials: "include",
 					method: "DELETE",
 					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
-						"Kombuciao-Voter-Id": voterId,
+						"Kombuciao-Voter-Id": getUserId() || "",
 					},
 				});
 				const res = await response.json();
@@ -88,9 +80,7 @@ class api {
 					method: "POST",
 					credentials: "include",
 					headers: {
-						"Content-Type": "application/json",
-						Accept: "application/json",
-						"Kombuciao-Voter-Id": voterId,
+						"Kombuciao-Voter-Id": getUserId() || "",
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
