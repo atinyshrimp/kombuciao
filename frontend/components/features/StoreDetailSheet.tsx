@@ -383,26 +383,47 @@ const VoteButtons = ({
 	const isDenied = userVote?.type === "deny";
 
 	async function handleVote(type: "confirm" | "deny") {
-		const isActionConfirmed = window.confirm(
-			`Voulez-vous vraiment ${
-				type === "confirm" ? "confirmer" : "contester"
-			} le signalement pour le magasin "${report.store.name || "Sans nom"}" ?`
-		);
-		if (!isActionConfirmed) return;
+		if (userVote) await handleDeleteVote();
+		else await handleCreateVote(type);
+	}
+
+	async function handleDeleteVote() {
+		if (report.votes.length === 1) {
+			if (
+				!window.confirm(
+					"Voulez-vous vraiment supprimer votre vote ? Cela supprimera également le signalement."
+				)
+			)
+				return;
+		}
 
 		try {
-			const { ok, error } = await api.post(`/reports/${report._id}/${type}`, {
-				voterId: userId,
+			const { ok, error } = await api.delete(
+				`/reports/${report._id}/vote/${userVote?._id}`
+			);
+			if (!ok) throw new Error(error);
+			toast.success("Vote supprimé avec succès");
+			fetchReports();
+		} catch (error) {
+			console.error("Error deleting vote:", error);
+			toast.error("Erreur lors de la suppression du vote");
+		}
+	}
+
+	async function handleCreateVote(type: "confirm" | "deny") {
+		try {
+			const { ok, error } = await api.post(`/reports/${report._id}/vote`, {
+				type,
 			});
 			if (!ok) throw new Error(error);
-			fetchReports();
+
+			const typeText = type === "confirm" ? "confirmation" : "contestation";
 			toast.success(
-				`Vote de ${
-					type === "confirm" ? "confirmation" : "contestation"
-				} enregistré avec succès pour le magasin "${
+				`Vote de ${typeText} enregistré avec succès pour le magasin "${
 					report.store.name || "Sans nom"
 				}"`
 			);
+			fetchReports();
 		} catch (error) {
 			console.error("Error voting:", error);
 			toast.error("Erreur lors de l'enregistrement du vote");
@@ -414,11 +435,10 @@ const VoteButtons = ({
 			<Button
 				variant="outline"
 				size="sm"
+				disabled={isDenied}
 				className={cn(
-					"h-8 px-2 flex items-center gap-1 text-emerald-600 cursor-pointer hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/60",
-					isConfirmed &&
-						"text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30",
-					userVote && "pointer-events-none"
+					"h-8 px-2 flex items-center gap-1 text-emerald-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border-emerald-200/60 dark:border-emerald-800/60",
+					isConfirmed && "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30"
 				)}
 				aria-label="Confirmer"
 				onClick={() => handleVote("confirm")}>
@@ -434,10 +454,10 @@ const VoteButtons = ({
 			<Button
 				variant="outline"
 				size="sm"
+				disabled={isConfirmed}
 				className={cn(
-					"h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200/60 dark:border-red-800/60",
-					isDenied && "text-red-600 bg-red-50 dark:bg-red-950/30",
-					userVote && "pointer-events-none"
+					"h-8 px-2 flex items-center gap-1 text-red-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 border-red-200/60 dark:border-red-800/60",
+					isDenied && "text-red-600 bg-red-50 dark:bg-red-950/30"
 				)}
 				aria-label="Contester"
 				onClick={() => handleVote("deny")}>
@@ -461,6 +481,10 @@ const ReportCard = ({
 	report: Report;
 	fetchReports: () => void;
 }) => {
+	let lastVoteAt = null;
+	if (report.votes.length > 1)
+		lastVoteAt = report.votes[report.votes.length - 1].createdAt;
+
 	return (
 		<div
 			key={report._id}
@@ -500,9 +524,9 @@ const ReportCard = ({
 					<span className="text-xs text-slate-500 dark:text-slate-400">
 						Signalé le {getDateString(new Date(report.createdAt))}
 					</span>
-					{report.votes.length > 1 && (
+					{lastVoteAt && (
 						<span className="text-xs text-slate-500 dark:text-slate-400">
-							Dernier vote le {getDateString(new Date(report.updatedAt))}
+							Dernier vote le {getDateString(new Date(lastVoteAt))}
 						</span>
 					)}
 				</div>

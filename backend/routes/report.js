@@ -9,8 +9,8 @@ router.get("/:id", reportCtrl.getReport); // get a specific report (optional, no
 
 // Protected routes
 router.post("/", validateApiKey, reportCtrl.createReport); // add a new report
-router.post("/:id/confirm", validateApiKey, reportCtrl.confirmReport); // confirm a report
-router.post("/:id/deny", validateApiKey, reportCtrl.denyReport); // deny a report
-router.delete("/:id", validateApiKey, reportCtrl.deleteReport); // delete a report (optional, not in original code)
+router.post("/:id/vote", validateApiKey, reportCtrl.createVote); // create a vote for a report
+router.delete("/:id/vote/:voteId", validateApiKey, reportCtrl.deleteVote); // delete a vote
+router.delete("/:id", validateApiKey, reportCtrl.deleteReport); // delete a report
 
 module.exports = router;

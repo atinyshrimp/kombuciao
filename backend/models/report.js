@@ -12,7 +12,7 @@ const voteSchema = new mongoose.Schema(
 			required: true,
 		},
 	},
-	{ createdAt: true }
+	{ timestamps: { createdAt: true, updatedAt: false } }
 );
 
 const reportSchema = new mongoose.Schema(
