@@ -20,18 +20,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-	title: "Kombuciao - Trouvez votre Ciao Kombucha",
+	title: "Kombuciao | Où acheter Ciao Kombucha près de chez vous",
 	description:
 		"Découvrez où trouver votre Ciao Kombucha préféré près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
 	keywords: [
-		"kombucha",
-		"ciao",
 		"kombuciao",
+		"où acheter ciao kombucha",
+		"trouver ciao kombucha",
 		"ciao kombucha",
+		"ciao kombucha squeezie",
+		"ciao kombucha magasin",
 		"ciao kombucha paris",
+		"ciao kombucha france",
 		"squeezie",
 		"squeezie kombucha",
-		"squeezie ciao kombucha",
 	],
 	openGraph: {
 		type: "website",
@@ -50,6 +52,19 @@ export const metadata: Metadata = {
 				alt: "Kombuciao - Trouvez votre Ciao Kombucha",
 			},
 		],
+	},
+	robots: {
+		index: true,
+		follow: true,
+		nocache: false,
+		googleBot: {
+			index: true,
+			follow: true,
+			noimageindex: false,
+			"max-video-preview": -1,
+			"max-image-preview": "large",
+			"max-snippet": -1,
+		},
 	},
 };
 
