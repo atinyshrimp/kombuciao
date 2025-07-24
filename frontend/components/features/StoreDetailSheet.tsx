@@ -132,7 +132,6 @@ export default function StoreDetailSheet({
 
 	const openingStatus = getOpeningStatus(store.openingHours || "");
 	const parsedHours = parseOpeningHours(store.openingHours || "");
-	console.log(parsedHours);
 
 	return (
 		<>
