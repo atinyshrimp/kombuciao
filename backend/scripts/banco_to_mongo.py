@@ -99,10 +99,16 @@ def row_to_update(row):
     name = row.get("name", "Sans nom") or row.get("brand", "Sans nom")
     if name is None or name == "" or pd.isna(name) or not name.strip():
         name = "Sans nom"
+
+    street = row.get("address", "")
+    if street is None or street == "" or pd.isna(street) or not street.strip():
+        street = ""
+
     address = {
-        "street": row.get("address", ""),
+        "street": street,
         "city": row.get("com_nom", ""),
-    }
+    }   
+
     types = [type.strip() for type in row.get("type", "").lower().split(";")]
     opening_hours = row.get("opening_hours", "")
     if opening_hours is None or pd.isna(opening_hours) or not opening_hours.strip():
