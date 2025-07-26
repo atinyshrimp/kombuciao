@@ -90,6 +90,10 @@ export default function HomePage() {
 		router.replace(newURL, { scroll: false });
 	};
 
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, []);
+
 	// Update URL whenever filters change
 	useEffect(() => {
 		const urlParams: Record<string, string | string[] | number | boolean> = {
