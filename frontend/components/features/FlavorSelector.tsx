@@ -19,7 +19,7 @@ const FlavorSelector = ({
 				value={selectedFlavors}
 				onChange={setSelectedFlavors}
 				placeholder="Sélectionner des saveurs"
-				className="w-full bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
+				className="w-full text-base lg:text-sm bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
 				hidePlaceholderWhenSelected
 			/>
 		</div>
