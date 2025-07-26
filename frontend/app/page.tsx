@@ -9,12 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import {
-	Sheet,
-	SheetContent,
-	SheetHeader,
-	SheetTitle,
-} from "@/components/ui/sheet";
 import { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
 
@@ -33,6 +27,12 @@ import {
 	CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { StatsCardMobile } from "@/components/cards/StatsCard";
+import {
+	Drawer,
+	DrawerContent,
+	DrawerHeader,
+	DrawerTitle,
+} from "@/components/ui/drawer";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -197,15 +197,13 @@ export default function HomePage() {
 				</section>
 
 				{/* ───────────────── MOBILE DRAWER ───────────────── */}
-				<Sheet open={showMobileList} onOpenChange={setShowMobileList}>
-					<SheetContent side="bottom" className="p-0 pb-6 max-h-[85vh]">
-						{/* Header with handlebar */}
-						<SheetHeader className="px-4 py-2 border-b border-slate-200/60 dark:border-slate-800/60">
-							<div className="w-full h-1.5 rounded-full bg-slate-300/60 dark:bg-slate-600/60 mx-auto mb-2" />
-							<SheetTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
+				<Drawer open={showMobileList} onOpenChange={setShowMobileList}>
+					<DrawerContent>
+						<DrawerHeader className="px-4 py-2 mb-4 border-b border-slate-200/60 dark:border-slate-800/60">
+							<DrawerTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
 								Recherche & Filtres
-							</SheetTitle>
-						</SheetHeader>
+							</DrawerTitle>
+						</DrawerHeader>
 
 						{/* Scrollable Content */}
 						<div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 text-sm">
@@ -300,8 +298,8 @@ export default function HomePage() {
 								/>
 							</div>
 						</div>
-					</SheetContent>
-				</Sheet>
+					</DrawerContent>
+				</Drawer>
 			</div>
 
 			<StoreDetailSheet fetchStores={fetchStores} />
