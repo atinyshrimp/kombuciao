@@ -91,6 +91,7 @@ export default function StoreDetailSheet({
 		return (
 			<Sheet open={isOpen} onOpenChange={() => setSelectedStore(null)}>
 				<SheetContent
+					onOpenAutoFocus={(e) => e.preventDefault()}
 					side="right"
 					className="w-full sm:max-w-lg p-0 overflow-hidden">
 					{/* Loading Header */}
