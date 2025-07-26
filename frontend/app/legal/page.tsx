@@ -58,7 +58,7 @@ export default function LegalPage() {
 							<li>Monétisation directe ou indirecte</li>
 						</ul>
 						<div className="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-							<p className="text-amber-800 dark:text-amber-200 text-sm">
+							<p className="text-amber-800 dark:text-amber-200 lg:text-sm">
 								* Liste non exhaustive
 							</p>
 						</div>
@@ -158,7 +158,7 @@ export default function LegalPage() {
 								<div className="font-medium text-slate-900 dark:text-slate-100">
 									Licence complète
 								</div>
-								<div className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="lg:text-sm text-slate-500 dark:text-slate-400">
 									Polyform Noncommercial 1.0.0
 								</div>
 							</div>
@@ -175,7 +175,7 @@ export default function LegalPage() {
 								<div className="font-medium text-slate-900 dark:text-slate-100">
 									Code source
 								</div>
-								<div className="text-sm text-slate-500 dark:text-slate-400">
+								<div className="lg:text-sm text-slate-500 dark:text-slate-400">
 									GitHub Repository
 								</div>
 							</div>

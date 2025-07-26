@@ -103,7 +103,7 @@ export default function StoreDetailSheet({
 									<SheetTitle className="text-white text-xl font-bold mb-2">
 										<Skeleton className="h-6 w-48 bg-white/20" />
 									</SheetTitle>
-									<div className="flex items-center gap-2 text-white/90 text-sm">
+									<div className="flex items-center gap-2 text-white/90 lg:text-sm">
 										<MapPin className="h-4 w-4 flex-shrink-0" />
 										<Skeleton className="h-4 w-32 bg-white/20" />
 									</div>
@@ -156,7 +156,7 @@ export default function StoreDetailSheet({
 									<SheetTitle className="text-white text-xl font-bold mb-2 line-clamp-2">
 										{store.name || "Sans nom"}
 									</SheetTitle>
-									<div className="flex items-center gap-2 text-white/90 text-sm">
+									<div className="flex items-center gap-2 text-white/90 lg:text-sm">
 										<MapPin className="h-4 w-4 flex-shrink-0" />
 										<span className="line-clamp-1">
 											{store.address.street && `${store.address.street}, `}
@@ -204,7 +204,7 @@ export default function StoreDetailSheet({
 									<Button
 										variant="outline"
 										size="sm"
-										className="h-8 px-3 text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
+										className="h-8 px-3 text-sm lg:text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
 										onClick={() =>
 											window.open(
 												`https://www.openstreetmap.org/${store.osmId}`,
@@ -218,7 +218,7 @@ export default function StoreDetailSheet({
 								<Button
 									variant="outline"
 									size="sm"
-									className="h-8 px-3 text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
+									className="h-8 px-3 text-sm lg:text-xs bg-white/20 text-white border-white/30 hover:bg-white/30 backdrop-blur-sm cursor-pointer"
 									onClick={() => {
 										const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
 											store.location.coordinates.reverse().join(",")
@@ -244,7 +244,7 @@ export default function StoreDetailSheet({
 											Horaires d&apos;ouverture
 										</h3>
 										<span
-											className={`text-sm font-medium ${
+											className={`lg:text-sm font-medium ${
 												openingStatus.isOpen
 													? "text-emerald-600"
 													: "text-red-600"
@@ -258,7 +258,7 @@ export default function StoreDetailSheet({
 											{parsedHours.map((schedule, index) => (
 												<div
 													key={index}
-													className="flex justify-between items-center text-sm">
+													className="flex justify-between items-center lg:text-sm">
 													<span className="font-medium text-slate-700 dark:text-slate-300">
 														{schedule.day}
 													</span>
@@ -282,7 +282,7 @@ export default function StoreDetailSheet({
 										</div>
 									) : (
 										<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-4 border border-slate-200/40 dark:border-slate-700/40">
-											<p className="text-sm text-slate-600 dark:text-slate-400">
+											<p className="lg:text-sm text-slate-600 dark:text-slate-400">
 												{store.openingHours}
 											</p>
 										</div>
@@ -300,14 +300,14 @@ export default function StoreDetailSheet({
 									<div className="flex items-center gap-2">
 										<Badge
 											variant="secondary"
-											className="text-xs bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60">
+											className="text-sm lg:text-xs bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60">
 											{reports.length} signalement
 											{reports.length !== 1 ? "s" : ""}
 										</Badge>
 										<Button
 											variant="ghost"
 											size="sm"
-											className="text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
+											className="text-sm lg:text-xs cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
 											onClick={() => setShowReportModal(true)}>
 											<Plus className="h-4 w-4" />
 										</Button>
@@ -335,10 +335,10 @@ export default function StoreDetailSheet({
 								) : reports.length === 0 ? (
 									<div className="bg-slate-50/80 dark:bg-slate-800/80 rounded-xl p-8 text-center border border-slate-200/40 dark:border-slate-700/40">
 										<MessageSquare className="h-8 w-8 text-slate-400 mx-auto mb-3" />
-										<p className="text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
+										<p className="lg:text-sm font-medium text-slate-900 dark:text-slate-100 mb-1">
 											Aucun signalement
 										</p>
-										<p className="text-xs text-slate-500 dark:text-slate-400">
+										<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 											Soyez le premier à signaler la disponibilité de kombucha
 											dans ce magasin !
 										</p>
@@ -447,7 +447,7 @@ const VoteButtons = ({
 				) : (
 					<TbArrowBigUp size={16} aria-hidden="true" />
 				)}
-				<span className="text-xs font-medium">
+				<span className="text-sm lg:text-xs font-medium">
 					{report.votes.filter((v) => v.type === "confirm").length}
 				</span>
 			</Button>
@@ -466,7 +466,7 @@ const VoteButtons = ({
 				) : (
 					<TbArrowBigDown size={16} aria-hidden="true" />
 				)}
-				<span className="text-xs font-medium">
+				<span className="text-sm lg:text-xs font-medium">
 					{report.votes.filter((v) => v.type === "deny").length}
 				</span>
 			</Button>
@@ -498,14 +498,14 @@ const ReportCard = ({
 						return (
 							<span
 								key={flavor}
-								className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60"
+								className="inline-flex items-center px-2.5 py-1 rounded-full text-sm lg:text-xs font-medium bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60"
 								title={label}>
 								{icon}
 							</span>
 						);
 					})}
 				</div>
-				<div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+				<div className="flex items-center gap-3 text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 					<div className="flex items-center gap-1">
 						<Users className="h-3 w-3" />
 						<span>{report.votes.length}</span>
@@ -514,18 +514,18 @@ const ReportCard = ({
 			</div>
 
 			{report.description && (
-				<p className="text-sm text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
+				<p className="lg:text-sm text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
 					{report.description}
 				</p>
 			)}
 
 			<div className="flex items-end justify-between">
 				<div className="flex flex-col items-start">
-					<span className="text-xs text-slate-500 dark:text-slate-400">
+					<span className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 						Signalé le {getDateString(new Date(report.createdAt))}
 					</span>
 					{lastVoteAt && (
-						<span className="text-xs text-slate-500 dark:text-slate-400">
+						<span className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 							Dernier vote le {getDateString(new Date(lastVoteAt))}
 						</span>
 					)}
@@ -596,7 +596,7 @@ const CreateReportModal = ({
 					<div className="space-y-2">
 						<label
 							htmlFor="description"
-							className="block text-sm font-medium text-slate-900 dark:text-slate-100">
+							className="block lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 							Où chercher le kombucha ?
 						</label>
 						<textarea
@@ -611,7 +611,7 @@ const CreateReportModal = ({
 					<div className="space-y-2">
 						<label
 							htmlFor="flavors"
-							className="block text-sm font-medium text-slate-900 dark:text-slate-100">
+							className="block lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 							Quelles saveurs t&apos;as trouvées ?
 						</label>
 						<FlavorSelector

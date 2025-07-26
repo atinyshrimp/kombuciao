@@ -210,7 +210,7 @@ export default function HomePage() {
 						</DrawerHeader>
 
 						{/* Scrollable Content */}
-						<div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 text-sm">
+						<div className="flex-1 overflow-y-auto px-4 py-2 space-y-4 lg:text-sm">
 							{/* Location Search */}
 							<Header
 								search={search}
@@ -244,7 +244,7 @@ export default function HomePage() {
 												<p className="font-medium text-slate-900 dark:text-slate-100">
 													Produits disponibles uniquement
 												</p>
-												<p className="text-xs text-slate-500 dark:text-slate-400">
+												<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 													Afficher seulement les magasins avec stock
 												</p>
 											</div>
@@ -268,7 +268,7 @@ export default function HomePage() {
 												onValueChange={(v) => setRadius(v[0])}
 												className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
 											/>
-											<div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+											<div className="flex justify-between text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 												<span>100m</span>
 												<span>5km</span>
 											</div>
@@ -372,7 +372,7 @@ function Header({
 
 	return (
 		<div className="space-y-2">
-			<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+			<h3 className="lg:text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
 				<SearchIcon className="w-4 h-4" />
 				Localisation
 			</h3>
@@ -383,7 +383,7 @@ function Header({
 					onBlur={() => setSearching(false)}
 					onChange={(e) => setSearch(e.target.value)}
 					placeholder="Entrer une adresse ou une ville"
-					className="text-sm ps-10 peer bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
+					className="lg:text-sm ps-10 peer bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
 				/>
 				<div className="text-slate-400 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
 					<MapPin size={16} aria-hidden="true" />
@@ -393,7 +393,7 @@ function Header({
 						{results.map((result: SearchResult, index) => (
 							<div
 								key={result.properties.osm_id || index}
-								className="flex flex-col px-4 py-3 text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-100/60 dark:border-slate-800/60 last:border-b-0 transition-colors"
+								className="flex flex-col px-4 py-3 lg:text-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 border-b border-slate-100/60 dark:border-slate-800/60 last:border-b-0 transition-colors"
 								onClick={() => handleResultClick(result)}>
 								<SearchResult result={result} />
 							</div>
@@ -417,7 +417,9 @@ const SearchResult = ({ result }: { result: SearchResult }) => {
 			<p className="font-medium text-slate-900 dark:text-slate-100">
 				{mainText}
 			</p>
-			<p className="text-xs text-slate-500 dark:text-slate-400">{subText}</p>
+			<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
+				{subText}
+			</p>
 		</div>
 	);
 };
@@ -446,7 +448,7 @@ function Filters({
 			<Collapsible>
 				<CollapsibleTrigger className="w-full flex items-center gap-2 cursor-pointer">
 					<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-					<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+					<h3 className="lg:text-sm font-semibold text-slate-900 dark:text-slate-100">
 						Filtres
 					</h3>
 				</CollapsibleTrigger>
@@ -455,10 +457,10 @@ function Filters({
 					{/* Availability Filter */}
 					<div className="flex items-center justify-between p-4 bg-slate-50/80 dark:bg-slate-800/80 rounded-xl border border-slate-200/40 dark:border-slate-700/40">
 						<div className="flex-1">
-							<span className="text-sm font-medium text-slate-900 dark:text-slate-100">
+							<span className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 								Produits disponibles uniquement
 							</span>
-							<p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+							<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400 mt-1">
 								Afficher seulement les magasins avec stock
 							</p>
 						</div>
@@ -471,7 +473,7 @@ function Filters({
 
 					{/* Radius Filter */}
 					<div className="space-y-3">
-						<label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+						<label className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 							Rayon de recherche: {formatNumber(currentRadius / 1000)} km
 						</label>
 						<div className="px-2">
@@ -485,7 +487,7 @@ function Filters({
 								className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
 							/>
 						</div>
-						<div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+						<div className="flex justify-between text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 							<span>100m</span>
 							<span>5km</span>
 						</div>
@@ -493,7 +495,7 @@ function Filters({
 
 					{/* Flavors Filter */}
 					<div className="space-y-3">
-						<label className="text-sm font-medium text-slate-900 dark:text-slate-100">
+						<label className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 							Saveurs préférées
 						</label>
 						<FlavorSelector
@@ -536,10 +538,10 @@ function StoreList({
 							<MapPin className="w-8 h-8 text-slate-400" />
 						</div>
 						<div>
-							<p className="text-sm font-medium text-slate-900 dark:text-slate-100">
+							<p className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 								Aucun magasin trouvé
 							</p>
-							<p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+							<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400 mt-1">
 								Essayez d&apos;élargir votre recherche ou changer de
 								localisation
 							</p>

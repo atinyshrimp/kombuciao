@@ -100,7 +100,7 @@ export default function RootLayout({
 										<h1 className="text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent dark:from-white dark:to-slate-300">
 											Kombuciao
 										</h1>
-										<p className="text-xs text-slate-500 dark:text-slate-400">
+										<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
 											Trouvez votre{" "}
 											<a
 												href={CIAO_KOMBUCHA_URL}
@@ -128,7 +128,7 @@ export default function RootLayout({
 							<div className="flex flex-col items-center gap-6 text-center">
 								{/* Main Footer Content */}
 								<div className="flex flex-col items-center gap-4">
-									<p className="text-xs text-slate-500 dark:text-slate-400 max-w-md">
+									<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400 max-w-md">
 										Découvrez où trouver votre{" "}
 										<a
 											href={CIAO_KOMBUCHA_URL}
@@ -143,7 +143,7 @@ export default function RootLayout({
 								</div>
 
 								{/* Links */}
-								<div className="flex items-center gap-6 text-xs">
+								<div className="flex items-center gap-6 text-sm lg:text-xs">
 									<Link
 										href="/about"
 										className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
@@ -162,7 +162,7 @@ export default function RootLayout({
 								</div>
 
 								{/* License Info */}
-								<div className="text-xs text-slate-400 dark:text-slate-500 space-y-1">
+								<div className="text-sm lg:text-xs text-slate-400 dark:text-slate-500 space-y-1">
 									<p>Kombuciao</p>
 									<p>
 										Licence Polyform Noncommercial 1.0.0 • Usage non commercial

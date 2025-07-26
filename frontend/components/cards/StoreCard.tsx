@@ -67,10 +67,10 @@ const StoreCard = ({ store }: { store: Store }) => {
 				<div className="flex flex-col flex-1 min-w-0">
 					{/* Store Name and Distance */}
 					<div className="flex items-start justify-between gap-2 mb-2">
-						<h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 line-clamp-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+						<h3 className="lg:text-sm font-semibold text-slate-900 dark:text-slate-100 line-clamp-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
 							{store.name || "Sans nom"}
 						</h3>
-						<div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/80 px-2 py-1 rounded-full">
+						<div className="flex items-center gap-1 text-sm lg:text-xs text-slate-500 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/80 px-2 py-1 rounded-full">
 							<MapPin className="w-3 h-3" />
 							<span className="font-medium">
 								{formatNumber(store.distance! / 1000)} km
@@ -79,7 +79,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 					</div>
 					{/* Address */}
 					{store.address.street && (
-						<p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mb-3">
+						<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mb-3">
 							{store.address.street}, {store.address.city}
 						</p>
 					)}
@@ -93,7 +93,7 @@ const StoreCard = ({ store }: { store: Store }) => {
 								return (
 									<span
 										key={flavor}
-										className="text-xs bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 font-medium shadow-sm">
+										className="text-sm lg:text-xs bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 font-medium shadow-sm">
 										{icon}
 									</span>
 								);
