@@ -1,0 +1,31 @@
+name: BANCO Data Update
+
+on:
+  schedule:
+    # Run every Monday at 12 AM UTC (02:00 AM Paris)
+    - cron: "0 0 * * 1"
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-banco:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      - name: Run BANCO update script
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: |
+          cd backend
+          python scripts/banco_to_mongo.py

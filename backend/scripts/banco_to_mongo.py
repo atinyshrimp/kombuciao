@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-# banco_to_mongo.py
 """
-Import filtered BANCO (Base Nationale des Commerces Ouverte) data into MongoDB.
+Import filtered BANCO (BAse Nationale des Commerces Ouverte) data into MongoDB.
 - Downloads the latest CSV ZIP from data.gouv.fr
 - Filters for supermarkets / convenience stores / etc.
-- Upserts into Mongo (unique index on name + coordinates)
+- Upserts into Mongo (unique index on osmId)
 
 Dependencies:
-    pip install pandas requests pymongo tqdm
+    pip install -r requirements.txt
 
 Environment variables required:
     MONGODB_URI  => mongodb://user:pass@host:port/db
-    DB_NAME      => test          (default if not set)
+    DB_NAME      => prod          (default if not set)
     COLL_NAME    => stores        (default if not set)
 """
 
@@ -19,7 +18,7 @@ import os, io, zipfile, tempfile, requests, sys, math
 from datetime import datetime
 import pandas as pd
 from tqdm import tqdm
-from pymongo import MongoClient, UpdateOne, ASCENDING
+from pymongo import MongoClient, UpdateOne
 from pymongo.errors import BulkWriteError
 from dotenv import load_dotenv
 
@@ -41,22 +40,55 @@ DROP_COLS = [
     "wikidata", "website", "phone", "email", "facebook", "com_insee"
 ]
 
-# 2️⃣ DOWNLOAD & EXTRACT ------------------------------------------------------
+# 2️⃣ CONNECT TO MONGO --------------------------------------------------------
+
+client = MongoClient(f"{MONGO_URI}&tlsAllowInvalidCertificates=true")
+coll   = client[DB_NAME][COLL_NAME]
+
+
+# 3️⃣ DOWNLOAD & EXTRACT ------------------------------------------------------
 
 print("⬇️  Downloading BANCO …")
 resp = requests.get(ZIP_URL, timeout=60)
 resp.raise_for_status()
 
+isUpdateMode = False
 with tempfile.TemporaryDirectory() as tmpdir:
     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
-        csv_name = next((n for n in z.namelist() if n.endswith(".csv")), None)
-        if not csv_name:
+        csv_name = next((n for n in z.namelist() if n.endswith("data.csv")), None)
+        metadata_name = next((n for n in z.namelist() if n.endswith("metadata.csv")), None)
+        if not csv_name or not metadata_name:
             print("CSV not found in archive.", file=sys.stderr)
             sys.exit(1)
         z.extract(csv_name, path=tmpdir)
         csv_path = os.path.join(tmpdir, csv_name)
+        z.extract(metadata_name, path=tmpdir)
+        metadata_path = os.path.join(tmpdir, metadata_name)
 
-    # 3️⃣ LOAD & FILTER -------------------------------------------------------
+    # 4️⃣ CHECK FOR LAST UPDATE ------------------------------------------------
+
+    metadata_df = pd.read_csv(metadata_path, sep=";", low_memory=False)
+    last_banco_update_str = metadata_df.loc[0, "DATE_MAJ"]
+    if not last_banco_update_str:
+        print("No last_update found in metadata.", file=sys.stderr)
+        sys.exit(1)
+    print(f"🕒 Last BANCO update: {last_banco_update_str}")
+
+    latest_doc = coll.find_one(sort=[("updatedAt", -1)], projection={"updatedAt": 1})
+    if latest_doc:
+        last_banco_update = datetime.strptime(last_banco_update_str, "%Y-%m-%d")
+        last_mongo_update = latest_doc["updatedAt"]
+        if last_banco_update >= last_mongo_update:
+            print("MongoDB data is not up to date, proceeding with update.")
+            isUpdateMode = True
+        else:
+            print("MongoDB data is up to date, skipping update.")
+            sys.exit(0)
+    else:
+        print("No documents in collection, skipping update, proceeding with full import.")
+
+
+    # 4️⃣ LOAD & FILTER -------------------------------------------------------
     df = pd.read_csv(csv_path, sep=";", low_memory=False)
     print(f"📄 CSV rows total: {len(df):,}")
 
@@ -70,12 +102,15 @@ with tempfile.TemporaryDirectory() as tmpdir:
     stores_df = df[mask].copy()
     print(f"✅ Rows kept after type filter: {len(stores_df):,}")
 
-# 4️⃣ CONNECT TO MONGO --------------------------------------------------------
+    if isUpdateMode:
+        # get all documents to update
+        date_mask = stores_df["last_update"].apply(
+            lambda x: datetime.strptime(x, "%Y-%m-%d") >= last_mongo_update
+        )
+        stores_df = stores_df[date_mask]
+        print(f"✅ Rows kept after update filter: {len(stores_df):,}")
 
-client = MongoClient(f"{MONGO_URI}&tlsAllowInvalidCertificates=true")
-coll   = client[DB_NAME][COLL_NAME]
-
-# 5️⃣ BUILD BULK UPSERTS ------------------------------------------------------
+# 6️⃣ BUILD BULK UPSERTS ------------------------------------------------------
 
 def row_to_update(row):
     try:
