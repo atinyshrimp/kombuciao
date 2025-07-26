@@ -75,7 +75,9 @@ export default function DynamicMap({
 	const markersRef = useRef<Record<string, L.Marker>>({});
 	const popupsRef = useRef<Record<string, L.Popup>>({});
 	const circleRef = useRef<L.Circle | null>(null);
+	const centerMarkerRef = useRef<L.Marker | null>(null);
 	const [isMapReady, setIsMapReady] = useState(false);
+	const isMobile = window.innerWidth < 768;
 
 	// Get the hovered store from context
 	const { hoveredStore, setHoveredStore, setSelectedStore } = useStoreContext();
@@ -127,14 +129,16 @@ export default function DynamicMap({
 		mapRef.current.setView(center, mapRef.current.getZoom(), { animate: true });
 	}, [center, isMapReady]);
 
-	// Update circle when location or radius changes
+	// Update circle and center marker when location or radius changes
 	useEffect(() => {
 		if (!mapRef.current || !isMapReady) return;
 
 		// Remove existing circle
-		if (circleRef.current) {
-			mapRef.current.removeLayer(circleRef.current);
-		}
+		if (circleRef.current) mapRef.current.removeLayer(circleRef.current);
+
+		// Remove existing center marker
+		if (centerMarkerRef.current)
+			mapRef.current.removeLayer(centerMarkerRef.current);
 
 		// Add new circle
 		const circle = L.circle(center, {
@@ -144,16 +148,20 @@ export default function DynamicMap({
 			fillOpacity: 0.2,
 		}).addTo(mapRef.current);
 
-		circle.bindPopup(`
-            <div class="text-sm">
-                <p class="font-medium mb-1">${radius / 1000} km Radius</p>
-                <p class="text-xs text-muted-foreground">
-                    Showing stores within ${radius / 1000} km of your location
-                </p>
-            </div>
-        `);
+		// Add center marker dot
+		const centerIcon = L.divIcon({
+			html: `<div style="width:12px;height:12px;background:#34d399;border:2px solid white;border-radius:50%;box-shadow:0 0 4px rgba(0,0,0,0.3);"></div>`,
+			className: "center-marker-icon",
+			iconSize: [12, 12],
+			iconAnchor: [6, 6],
+		});
+
+		const centerMarker = L.marker(center, {
+			icon: centerIcon,
+		}).addTo(mapRef.current);
 
 		circleRef.current = circle;
+		centerMarkerRef.current = centerMarker;
 	}, [center, radius, isMapReady]);
 
 	// Handle hoveredStore changes from context
@@ -161,7 +169,7 @@ export default function DynamicMap({
 		if (!mapRef.current || !isMapReady) return;
 
 		// If we have a hovered store, show its popup and update icon
-		if (hoveredStore && markersRef.current[hoveredStore]) {
+		if (hoveredStore && markersRef.current[hoveredStore] && !isMobile) {
 			const marker = markersRef.current[hoveredStore];
 			const popup = popupsRef.current[hoveredStore];
 
