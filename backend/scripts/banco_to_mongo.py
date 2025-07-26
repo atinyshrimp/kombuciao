@@ -19,7 +19,7 @@ import os, io, zipfile, tempfile, requests, sys, math
 from datetime import datetime
 import pandas as pd
 from tqdm import tqdm
-from pymongo import MongoClient, UpdateOne, ASCENDING
+from pymongo import MongoClient, UpdateOne
 from pymongo.errors import BulkWriteError
 from dotenv import load_dotenv
 
