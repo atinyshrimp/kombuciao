@@ -228,69 +228,14 @@ export default function HomePage() {
 							)}
 
 							{/* Filters - collapsed on mobile by default */}
-							<Card className="p-4 bg-white/70 dark:bg-slate-900/70 shadow-sm border border-slate-200/50 dark:border-slate-800/50">
-								<Collapsible defaultOpen={false}>
-									<CollapsibleTrigger className="w-full flex items-center gap-2 text-left">
-										<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
-										<span className="font-medium text-slate-900 dark:text-slate-100">
-											Filtres de recherche
-										</span>
-									</CollapsibleTrigger>
-
-									<CollapsibleContent className="space-y-4 mt-4">
-										{/* Only Available */}
-										<div className="flex items-center justify-between bg-slate-100/50 dark:bg-slate-800/50 p-3 rounded-lg">
-											<div>
-												<p className="font-medium text-slate-900 dark:text-slate-100">
-													Produits disponibles uniquement
-												</p>
-												<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
-													Afficher seulement les magasins avec stock
-												</p>
-											</div>
-											<Switch
-												className="ml-2"
-												checked={onlyAvailable}
-												onCheckedChange={setOnlyAvailable}
-											/>
-										</div>
-
-										{/* Radius */}
-										<div className="space-y-2">
-											<label className="block font-medium">
-												Rayon de recherche : {formatNumber(radius / 1000)} km
-											</label>
-											<Slider
-												min={100}
-												max={5000}
-												step={100}
-												value={[radius]}
-												onValueChange={(v) => setRadius(v[0])}
-												className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
-											/>
-											<div className="flex justify-between text-sm lg:text-xs text-slate-500 dark:text-slate-400">
-												<span>100m</span>
-												<span>5km</span>
-											</div>
-										</div>
-
-										{/* Flavors */}
-										<div className="space-y-1">
-											<label className="block font-medium">
-												Saveurs préférées
-											</label>
-											<div className="relative z-[60]">
-												{" "}
-												{/* fix dropdown overlapping issue */}
-												<FlavorSelector
-													selectedFlavors={selectedFlavors}
-													setSelectedFlavors={setSelectedFlavors}
-												/>
-											</div>
-										</div>
-									</CollapsibleContent>
-								</Collapsible>
-							</Card>
+							<FiltersMobile
+								radius={radius}
+								setRadius={setRadius}
+								onlyAvailable={onlyAvailable}
+								setOnlyAvailable={setOnlyAvailable}
+								selectedFlavors={selectedFlavors}
+								setSelectedFlavors={setSelectedFlavors}
+							/>
 
 							{/* Store List */}
 							<div className="space-y-4">
@@ -502,6 +447,82 @@ function Filters({
 							selectedFlavors={selectedFlavors}
 							setSelectedFlavors={setSelectedFlavors}
 						/>
+					</div>
+				</CollapsibleContent>
+			</Collapsible>
+		</Card>
+	);
+}
+
+function FiltersMobile({
+	radius,
+	setRadius,
+	onlyAvailable,
+	setOnlyAvailable,
+	selectedFlavors,
+	setSelectedFlavors,
+}: FiltersProps) {
+	const [currentRadius, setCurrentRadius] = useState(radius);
+
+	return (
+		<Card className="p-4 bg-white/70 dark:bg-slate-900/70 shadow-sm border border-slate-200/50 dark:border-slate-800/50">
+			<Collapsible defaultOpen={false}>
+				<CollapsibleTrigger className="w-full flex items-center gap-2 text-left">
+					<Filter className="w-4 h-4 text-slate-600 dark:text-slate-400" />
+					<span className="font-medium text-slate-900 dark:text-slate-100">
+						Filtres de recherche
+					</span>
+				</CollapsibleTrigger>
+
+				<CollapsibleContent className="space-y-4 mt-4">
+					{/* Only Available */}
+					<div className="flex items-center justify-between bg-slate-100/50 dark:bg-slate-800/50 p-3 rounded-lg">
+						<div>
+							<p className="font-medium text-slate-900 dark:text-slate-100">
+								Produits disponibles uniquement
+							</p>
+							<p className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
+								Afficher seulement les magasins avec stock
+							</p>
+						</div>
+						<Switch
+							className="ml-2"
+							checked={onlyAvailable}
+							onCheckedChange={setOnlyAvailable}
+						/>
+					</div>
+
+					{/* Radius */}
+					<div className="space-y-2">
+						<label className="block font-medium">
+							Rayon de recherche : {formatNumber(currentRadius / 1000)} km
+						</label>
+						<Slider
+							min={100}
+							max={5000}
+							step={100}
+							value={[currentRadius]}
+							onValueChange={(v) => setCurrentRadius(v[0])}
+							onValueCommit={(v) => setRadius(v[0])}
+							className="[&_[role=slider]]:bg-gradient-to-r [&_[role=slider]]:from-emerald-400 [&_[role=slider]]:to-teal-500"
+						/>
+						<div className="flex justify-between text-sm lg:text-xs text-slate-500 dark:text-slate-400">
+							<span>100m</span>
+							<span>5km</span>
+						</div>
+					</div>
+
+					{/* Flavors */}
+					<div className="space-y-1">
+						<label className="block font-medium">Saveurs préférées</label>
+						<div className="relative z-[60]">
+							{" "}
+							{/* fix dropdown overlapping issue */}
+							<FlavorSelector
+								selectedFlavors={selectedFlavors}
+								setSelectedFlavors={setSelectedFlavors}
+							/>
+						</div>
 					</div>
 				</CollapsibleContent>
 			</Collapsible>
