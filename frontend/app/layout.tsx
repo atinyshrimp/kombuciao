@@ -75,6 +75,12 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="fr">
+			<head>
+				<meta
+					name="viewport"
+					content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+				/>
+			</head>
 			<body
 				className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-slate-50 via-white to-blue-50/30 dark:from-slate-950 dark:via-slate-900 dark:to-blue-950/20`}>
 				<div className="min-h-screen flex flex-col">
