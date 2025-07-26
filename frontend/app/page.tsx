@@ -201,7 +201,10 @@ export default function HomePage() {
 				</section>
 
 				{/* ───────────────── MOBILE DRAWER ───────────────── */}
-				<Drawer open={showMobileList} onOpenChange={setShowMobileList}>
+				<Drawer
+					open={showMobileList}
+					onOpenChange={setShowMobileList}
+					repositionInputs={false}>
 					<DrawerContent>
 						<DrawerHeader className="px-4 py-2 mb-4 border-b border-slate-200/60 dark:border-slate-800/60">
 							<DrawerTitle className="text-base font-semibold text-slate-900 dark:text-slate-100">
