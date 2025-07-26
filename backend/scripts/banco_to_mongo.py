@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-# banco_to_mongo.py
 """
-Import filtered BANCO (Base Nationale des Commerces Ouverte) data into MongoDB.
+Import filtered BANCO (BAse Nationale des Commerces Ouverte) data into MongoDB.
 - Downloads the latest CSV ZIP from data.gouv.fr
 - Filters for supermarkets / convenience stores / etc.
-- Upserts into Mongo (unique index on name + coordinates)
+- Upserts into Mongo (unique index on osmId)
 
 Dependencies:
-    pip install pandas requests pymongo tqdm
+    pip install -r requirements.txt
 
 Environment variables required:
     MONGODB_URI  => mongodb://user:pass@host:port/db
-    DB_NAME      => test          (default if not set)
+    DB_NAME      => prod          (default if not set)
     COLL_NAME    => stores        (default if not set)
 """
 
