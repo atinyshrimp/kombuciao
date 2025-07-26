@@ -1,4 +1,3 @@
-// controllers/report.controller.js
 const Report = require("../models/report.js");
 const Store = require("../models/store.js");
 

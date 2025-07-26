@@ -52,63 +52,72 @@ print("⬇️  Downloading BANCO …")
 resp = requests.get(ZIP_URL, timeout=60)
 resp.raise_for_status()
 
-isUpdateMode = False
+is_update_mode = False
+
 with tempfile.TemporaryDirectory() as tmpdir:
     with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
+        # Extract relevant filenames
         csv_name = next((n for n in z.namelist() if n.endswith("data.csv")), None)
         metadata_name = next((n for n in z.namelist() if n.endswith("metadata.csv")), None)
+
         if not csv_name or not metadata_name:
-            print("CSV not found in archive.", file=sys.stderr)
-            sys.exit(1)
+            sys.exit("❌ CSV or metadata file not found in archive.")
+
+        # Extract files
         z.extract(csv_name, path=tmpdir)
-        csv_path = os.path.join(tmpdir, csv_name)
         z.extract(metadata_name, path=tmpdir)
+
+        csv_path = os.path.join(tmpdir, csv_name)
         metadata_path = os.path.join(tmpdir, metadata_name)
 
-    # 4️⃣ CHECK FOR LAST UPDATE ------------------------------------------------
-
+    # 📅 Check last update timestamp
     metadata_df = pd.read_csv(metadata_path, sep=";", low_memory=False)
     last_banco_update_str = metadata_df.loc[0, "DATE_MAJ"]
+
     if not last_banco_update_str:
-        print("No last_update found in metadata.", file=sys.stderr)
-        sys.exit(1)
+        sys.exit("❌ No DATE_MAJ found in metadata.")
+
     print(f"🕒 Last BANCO update: {last_banco_update_str}")
 
     latest_doc = coll.find_one(sort=[("updatedAt", -1)], projection={"updatedAt": 1})
     if latest_doc:
-        last_banco_update = datetime.strptime(last_banco_update_str, "%Y-%m-%d")
         last_mongo_update = latest_doc["updatedAt"]
+        print(f"🕒 Last MongoDB update: {last_mongo_update.strftime('%Y-%m-%d')}")
+
+        last_banco_update = datetime.strptime(last_banco_update_str, "%Y-%m-%d")
+
         if last_banco_update >= last_mongo_update:
-            print("MongoDB data is not up to date, proceeding with update.")
-            isUpdateMode = True
+            print("🔁 MongoDB data is outdated, proceeding with update.")
+            is_update_mode = True
         else:
-            print("MongoDB data is up to date, skipping update.")
+            print("✅ MongoDB data is up to date, skipping update.")
             sys.exit(0)
     else:
-        print("No documents in collection, skipping update, proceeding with full import.")
+        print("📂 No documents in collection, proceeding with full import.")
 
-
-    # 4️⃣ LOAD & FILTER -------------------------------------------------------
+    # 📊 Load and filter data
     df = pd.read_csv(csv_path, sep=";", low_memory=False)
     print(f"📄 CSV rows total: {len(df):,}")
 
-    # drop unneeded columns
-    df = df.drop(columns=[c for c in DROP_COLS if c in df.columns], errors="ignore")
+    # Drop unnecessary columns
+    df.drop(columns=[c for c in DROP_COLS if c in df.columns], inplace=True, errors="ignore")
 
-    # keep only allowed types (handles multi-tag strings)
+    # Filter allowed types (case-insensitive, split by ;)
     mask = df["type"].apply(
         lambda x: any(tag in ALLOWED_TYPES for tag in str(x).lower().split(";"))
     )
     stores_df = df[mask].copy()
-    print(f"✅ Rows kept after type filter: {len(stores_df):,}")
+    print(f"✅ Rows after type filter: {len(stores_df):,}")
 
-    if isUpdateMode:
-        # get all documents to update
-        date_mask = stores_df["last_update"].apply(
-            lambda x: datetime.strptime(x, "%Y-%m-%d") >= last_mongo_update
-        )
-        stores_df = stores_df[date_mask]
-        print(f"✅ Rows kept after update filter: {len(stores_df):,}")
+    # Drop duplicates
+    stores_df.drop_duplicates(subset=["X", "Y", "name"], keep="last", inplace=True)
+    print(f"✅ Rows after deduplication: {len(stores_df):,}")
+
+    # If in update mode, filter by last update date
+    if is_update_mode:
+        stores_df["last_update"] = pd.to_datetime(stores_df["last_update"], errors="coerce")
+        stores_df = stores_df[stores_df["last_update"] >= last_mongo_update]
+        print(f"✅ Rows after update filter: {len(stores_df):,}")
 
 # 6️⃣ BUILD BULK UPSERTS ------------------------------------------------------
 
