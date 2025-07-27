@@ -102,9 +102,8 @@ export default function HomePage() {
 
 		if (radius !== 1000) urlParams.radius = radius;
 		if (onlyAvailable) urlParams.onlyAvailable = true;
-		if (selectedFlavors.length > 0) {
+		if (selectedFlavors.length > 0)
 			urlParams.flavor = selectedFlavors.map((f) => f.value);
-		}
 		if (
 			location[0] !== PARIS_COORDINATES[0] ||
 			location[1] !== PARIS_COORDINATES[1]
@@ -112,8 +111,9 @@ export default function HomePage() {
 			urlParams.lng = location[0];
 			urlParams.lat = location[1];
 		}
+		if (searchParams.get("storeId"))
+			urlParams.storeId = searchParams.get("storeId")!;
 
-		console.log("Updating URL with params:", urlParams);
 		updateURL(urlParams);
 		fetchStores();
 	}, [currentPage, radius, onlyAvailable, selectedFlavors, location]);
