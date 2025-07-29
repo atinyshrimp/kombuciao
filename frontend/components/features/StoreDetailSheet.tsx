@@ -295,14 +295,18 @@ export default function StoreDetailSheet({
 								<div className="flex items-center justify-between">
 									<h3 className="font-semibold text-base flex items-center gap-2 text-slate-900 dark:text-slate-100">
 										<MessageSquare className="h-4 w-4 text-emerald-600" />
-										Signalements Kombucha
+										Signalements
 									</h3>
 									<div className="flex items-center gap-2">
 										<Badge
 											variant="secondary"
 											className="text-sm lg:text-xs bg-slate-100/80 dark:bg-slate-800/80 border-slate-200/60 dark:border-slate-700/60">
-											{reports.length} signalement
-											{reports.length !== 1 ? "s" : ""}
+											{reports.length}
+											<span className="hidden lg:inline">
+												{" "}
+												signalement
+												{reports.length !== 1 ? "s" : ""}
+											</span>
 										</Badge>
 										<Button
 											variant="ghost"
