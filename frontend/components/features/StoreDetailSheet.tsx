@@ -514,18 +514,18 @@ const ReportCard = ({
 			</div>
 
 			{report.description && (
-				<p className="lg:text-sm text-slate-600 dark:text-slate-400 mb-3 leading-relaxed">
+				<p className="text-sm text-slate-600 break-words dark:text-slate-400 mb-3 leading-relaxed">
 					{report.description}
 				</p>
 			)}
 
 			<div className="flex items-end justify-between">
 				<div className="flex flex-col items-start">
-					<span className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
+					<span className="text-xs text-slate-500 dark:text-slate-400">
 						Signalé le {getDateString(new Date(report.createdAt))}
 					</span>
 					{lastVoteAt && (
-						<span className="text-sm lg:text-xs text-slate-500 dark:text-slate-400">
+						<span className="text-xs text-slate-500 dark:text-slate-400">
 							Dernier vote le {getDateString(new Date(lastVoteAt))}
 						</span>
 					)}
