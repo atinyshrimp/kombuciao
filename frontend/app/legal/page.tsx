@@ -111,7 +111,7 @@ export default function LegalPage() {
 									className="text-indigo-500 hover:text-indigo-600 transition-colors">
 									BAse Nationale des Commerces Ouverte (BANCO)
 								</a>
-								. La modification de ces données ne peut être effectuée de notre
+								. La modification de ces données ne peut être effectuée de mon
 								côté.
 							</p>
 							<p className="text-slate-600 dark:text-slate-400 mt-2">

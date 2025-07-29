@@ -101,8 +101,7 @@ export default function AboutPage() {
 							className="text-indigo-500 hover:text-indigo-600 transition-colors">
 							BAse Nationale des Commerces Ouverte (BANCO)
 						</a>
-						. La modification de ces données ne peut être effectuée de notre
-						côté.
+						. La modification de ces données ne peut être effectuée de mon côté.
 					</p>
 				</div>
 
