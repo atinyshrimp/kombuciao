@@ -88,6 +88,18 @@ export default function LegalPage() {
 
 						<div>
 							<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+								Clause de non-affiliation
+							</h3>
+							<p className="text-slate-600 dark:text-slate-400">
+								Ce site n&apos;est pas affilié, sponsorisé ni approuvé par Ciao
+								Kombucha ou ses représentants. Toutes les marques et noms de
+								produits mentionnés sont la propriété de leurs détenteurs
+								respectifs et ne suggèrent aucune association avec ce site.
+							</p>
+						</div>
+
+						<div>
+							<h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
 								Données et contenu
 							</h3>
 							<p className="text-slate-600 dark:text-slate-400">

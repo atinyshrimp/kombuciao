@@ -168,6 +168,7 @@ export default function RootLayout({
 										Licence Polyform Noncommercial 1.0.0 • Usage non commercial
 										uniquement
 									</p>
+									<p>Non affilié à Ciao Kombucha.</p>
 								</div>
 							</div>
 						</div>
