@@ -33,11 +33,11 @@ export interface SearchResult {
 	};
 	properties: {
 		name: string;
-		postcode: string;
-		city: string;
+		postcode?: string;
+		city?: string;
 		osm_id: number;
-		housenumber: string;
-		street: string;
+		housenumber?: string;
+		street?: string;
 	};
 }
 

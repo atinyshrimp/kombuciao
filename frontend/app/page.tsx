@@ -11,21 +11,10 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Option } from "@/components/ui/multiselect";
 import StoreCard, { StoreCardSkeleton } from "@/components/cards/StoreCard";
-
-import { FLAVORS, PARIS_COORDINATES } from "@/constants";
-import api from "@/app/api";
-import type { Store, SearchResult } from "@/types/store";
 import StorePagination from "@/components/features/StorePagination";
-import { StoreProvider } from "@/lib/store-context";
 import StoreDetailSheet from "@/components/features/StoreDetailSheet";
 import FlavorSelector from "@/components/features/FlavorSelector";
 import StoreMap from "@/components/map";
-import { formatNumber } from "@/lib/utils";
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { StatsCardMobile } from "@/components/cards/StatsCard";
 import {
 	Drawer,
@@ -33,6 +22,17 @@ import {
 	DrawerHeader,
 	DrawerTitle,
 } from "@/components/ui/drawer";
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+
+import { FLAVORS, PARIS_COORDINATES } from "@/constants";
+import api from "@/app/api";
+import { StoreProvider } from "@/lib/store-context";
+import { formatNumber } from "@/lib/utils";
+import type { Store, SearchResult } from "@/types/store";
 
 export default function HomePage() {
 	const router = useRouter();
@@ -330,7 +330,7 @@ function Header({
 					onFocus={() => setSearching(true)}
 					onBlur={() => setSearching(false)}
 					onChange={(e) => setSearch(e.target.value)}
-					placeholder="Entrer une adresse ou une ville"
+					placeholder="Adresse/ville pour trouver les magasins"
 					className="lg:text-sm ps-10 peer bg-white/80 backdrop-blur-sm border-slate-200/60 focus:border-slate-400 dark:bg-slate-800/80 dark:border-slate-700/60 dark:focus:border-slate-500"
 				/>
 				<div className="text-slate-400 pointer-events-none absolute inset-y-0 start-0 flex items-center justify-center ps-3 peer-disabled:opacity-50">
@@ -354,11 +354,15 @@ function Header({
 }
 
 const SearchResult = ({ result }: { result: SearchResult }) => {
-	let mainText = result.properties.name;
-	const subText = `${result.properties.postcode} ${result.properties.city}`;
-	if (result.properties.housenumber) {
+	let mainText = result.properties.name || "Lieu sans nom";
+
+	const postcode = result.properties.postcode || "";
+	const city = result.properties.city || "";
+	const subText =
+		[postcode, city].filter(Boolean).join(" ") || "Adresse non disponible";
+
+	if (result.properties.housenumber && result.properties.street)
 		mainText = `${result.properties.housenumber} ${result.properties.street}`;
-	}
 
 	return (
 		<div className="flex flex-col">
@@ -401,7 +405,7 @@ function Filters({
 					</h3>
 				</CollapsibleTrigger>
 
-				<CollapsibleContent className="space-y-6 mt-2">
+				<CollapsibleContent className="space-y-4 mt-2">
 					{/* Availability Filter */}
 					<div className="flex items-center justify-between p-4 bg-slate-50/80 dark:bg-slate-800/80 rounded-xl border border-slate-200/40 dark:border-slate-700/40">
 						<div className="flex-1">
@@ -424,7 +428,7 @@ function Filters({
 						<label className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
 							Rayon de recherche: {formatNumber(currentRadius / 1000)} km
 						</label>
-						<div className="px-2">
+						<div className="mt-1 px-2">
 							<Slider
 								min={100}
 								max={5000}
@@ -443,9 +447,11 @@ function Filters({
 
 					{/* Flavors Filter */}
 					<div className="space-y-3">
-						<label className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
-							Saveurs préférées
-						</label>
+						<div className="mb-1">
+							<label className="lg:text-sm font-medium text-slate-900 dark:text-slate-100">
+								Saveurs préférées
+							</label>
+						</div>
 						<FlavorSelector
 							selectedFlavors={selectedFlavors}
 							setSelectedFlavors={setSelectedFlavors}
@@ -497,7 +503,7 @@ function FiltersMobile({
 
 					{/* Radius */}
 					<div className="space-y-2">
-						<label className="block font-medium">
+						<label className="block font-medium mb-2">
 							Rayon de recherche : {formatNumber(currentRadius / 1000)} km
 						</label>
 						<Slider
@@ -554,7 +560,7 @@ function StoreList({
 	}
 
 	return (
-		<div className="space-y-3 overflow-y-auto">
+		<div className="space-y-3 overflow-y-auto pb-4">
 			{(!stores || !stores.length) && (
 				<Card className="p-8 text-center bg-white/60 backdrop-blur-sm border-slate-200/60 dark:bg-slate-900/60 dark:border-slate-800/60">
 					<div className="space-y-3">
