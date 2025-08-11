@@ -137,7 +137,11 @@ def row_to_update(row):
     existing = coll.find_one(update_filter)
 
     # Skip if the document is already up to date
-    if existing and datetime.strptime(row["last_update"], "%Y-%m-%d") < existing["updatedAt"]:
+    last_update = row.get("last_update", None)
+    if last_update and isinstance(last_update, str):
+        last_update = datetime.strptime(last_update, "%Y-%m-%d")
+
+    if existing and last_update < existing["updatedAt"]:
         return None
 
     name = row.get("name", "Sans nom") or row.get("brand", "Sans nom")
