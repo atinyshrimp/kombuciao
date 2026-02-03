@@ -1,7 +1,16 @@
+import { Vote } from "@/types/store";
 import Report from "../models/report";
 import Store from "../models/store";
+import { FilterQuery } from "mongoose";
 
-export async function createReport(body: any) {
+interface CreateReportBody {
+	storeId: string;
+	flavors: string[];
+	description?: string;
+	voterId: string;
+}
+
+export async function createReport(body: CreateReportBody) {
 	const { storeId, flavors, description, voterId } = body;
 
 	if (!storeId || !flavors || !Array.isArray(flavors) || flavors.length === 0) {
@@ -52,11 +61,18 @@ export async function getReport(id: string) {
 	}
 }
 
-export async function listReports(query: any) {
+interface ListReportsQuery {
+	storeId?: string;
+	since?: string;
+	page?: string;
+	pageSize?: string;
+}
+
+export async function listReports(query: ListReportsQuery) {
 	try {
 		const { storeId, since, page = "1", pageSize = "10" } = query;
 
-		const criteria: any = {};
+		const criteria: FilterQuery<typeof Report> = {};
 		if (storeId) criteria.store = storeId;
 		if (since) criteria.createdAt = { $gte: new Date(since) };
 
@@ -97,9 +113,13 @@ export async function deleteReport(id: string) {
 	}
 }
 
+interface CreateVoteBody {
+	type: "confirm" | "deny";
+}
+
 export async function createVote(
 	id: string,
-	body: any,
+	body: CreateVoteBody,
 	voterId: string | null
 ) {
 	const { type } = body;
@@ -166,7 +186,9 @@ export async function deleteVote(
 		if (!report)
 			return { status: 404, data: { ok: false, error: "Not found" } };
 
-		const vote = report.votes.find((v: any) => v._id.toString() === voteId);
+		const vote = report.votes.find(
+			(v: Vote) => v._id && v._id.toString() === voteId
+		);
 		if (!vote)
 			return { status: 404, data: { ok: false, error: "Vote not found" } };
 

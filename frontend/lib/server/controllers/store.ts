@@ -1,6 +1,16 @@
 import Store from "../models/store";
+import { PipelineStage } from "mongoose";
 
-export async function createStore(body: any) {
+interface CreateStoreBody {
+	name: string;
+	location: { type: string; coordinates: [number, number] };
+	address?: { street?: string; postcode?: string; city?: string };
+	openingHours?: string;
+	types?: string[];
+	osmId?: string;
+}
+
+export async function createStore(body: CreateStoreBody) {
 	const { name, location } = body;
 	if (!name || !location) {
 		return {
@@ -22,7 +32,18 @@ export async function createStore(body: any) {
 	}
 }
 
-export async function listStores(query: any) {
+interface ListStoresQuery {
+	lat?: string;
+	lng?: string;
+	name?: string;
+	radius?: string;
+	page?: string;
+	pageSize?: string;
+	onlyAvailable?: string;
+	flavor?: string | string[];
+}
+
+export async function listStores(query: ListStoresQuery) {
 	try {
 		const {
 			lat,
@@ -40,7 +61,7 @@ export async function listStores(query: any) {
 		const flavorArray = Array.isArray(flavor) ? flavor : flavor ? [flavor] : [];
 
 		/* ---------- Base pipeline ---------- */
-		const stages: any[] = [];
+		const stages: PipelineStage[] = [];
 
 		/* 1️⃣  Geo filter (must be first) */
 		if (lat && lng) {
@@ -58,8 +79,9 @@ export async function listStores(query: any) {
 		}
 
 		/* 2️⃣  Name filter (optional) */
-		if (name)
+		if (name) {
 			stages.push({ $match: { name: { $regex: name, $options: "i" } } });
+		}
 
 		/* 3️⃣  Lookup only recent reports */
 		stages.push({
@@ -75,8 +97,9 @@ export async function listStores(query: any) {
 		});
 
 		/* 4️⃣  Keep stores that actually have reports */
-		if (onlyAvailable === "true")
+		if (onlyAvailable === "true") {
 			stages.push({ $match: { "recentReports.0": { $exists: true } } });
+		}
 
 		/* 5️⃣  Merge flavours from recent reports */
 		stages.push({
@@ -92,8 +115,9 @@ export async function listStores(query: any) {
 		});
 
 		/* 6️⃣  Filter on specific flavor(s), if provided */
-		if (flavorArray.length > 0)
+		if (flavorArray.length > 0) {
 			stages.push({ $match: { flavors: { $all: flavorArray } } });
+		}
 
 		/* 7️⃣  Remove recentReports from output */
 		stages.push({ $project: { recentReports: 0 } });
@@ -120,13 +144,15 @@ export async function listStores(query: any) {
 }
 
 export async function getStore(id: string) {
-	if (!id)
+	if (!id) {
 		return { status: 400, data: { ok: false, error: "Store ID is required" } };
+	}
 
 	try {
 		const store = await Store.findById(id);
-		if (!store)
+		if (!store) {
 			return { status: 404, data: { ok: false, error: "Store not found" } };
+		}
 
 		return { status: 200, data: { ok: true, data: store } };
 	} catch (error) {
@@ -135,7 +161,15 @@ export async function getStore(id: string) {
 	}
 }
 
-export async function updateStore(id: string, body: any) {
+interface UpdateStoreBody {
+	name?: string;
+	address?: { street?: string; postcode?: string; city?: string };
+	location?: unknown;
+	openingHours?: string;
+	types?: string[];
+}
+
+export async function updateStore(id: string, body: UpdateStoreBody) {
 	if (!id)
 		return { status: 400, data: { ok: false, error: "Store ID is required" } };
 
@@ -181,7 +215,13 @@ export async function deleteStore(id: string) {
 	}
 }
 
-export async function getStats(query: any) {
+interface GetStatsQuery {
+	lat?: string;
+	lng?: string;
+	radius?: string;
+}
+
+export async function getStats(query: GetStatsQuery) {
 	try {
 		const { lat, lng, radius = "5000" } = query;
 		if ((!lat || !lng) && radius !== "5000") {
@@ -191,7 +231,7 @@ export async function getStats(query: any) {
 			};
 		}
 
-		const stages: any[] = [];
+		const stages: PipelineStage[] = [];
 		if (lat && lng) {
 			stages.push({
 				$geoNear: {
