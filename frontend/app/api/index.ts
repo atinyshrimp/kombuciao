@@ -1,9 +1,4 @@
-"use server";
-
 import { getUserId } from "@/lib/utils";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const apiURL = "/api";
 
