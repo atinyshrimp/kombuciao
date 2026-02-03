@@ -7,12 +7,9 @@ import { Milk } from "lucide-react";
 import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
-import { CIAO_KOMBUCHA_URL } from "@/constants";
+import { CIAO_KOMBUCHA_URL, BASE_URL } from "@/constants";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
-	subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
@@ -20,6 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+	metadataBase: new URL(BASE_URL),
 	title: "Kombuciao | Où trouver du Ciao Kombucha près de chez vous",
 	description:
 		"Découvrez où trouver votre Ciao Kombucha tant recherché près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
@@ -35,9 +33,10 @@ export const metadata: Metadata = {
 		"squeezie",
 		"squeezie kombucha",
 	],
+	alternates: { canonical: "/" },
 	openGraph: {
 		type: "website",
-		url: "https://kombuciao.vercel.app",
+		url: BASE_URL,
 		title: "Kombuciao - Trouvez votre Ciao Kombucha",
 		description:
 			"Découvrez où trouver votre Ciao Kombucha tant recherché près de chez vous. Localisez les magasins avec les saveurs disponibles en temps réel.",
@@ -46,7 +45,7 @@ export const metadata: Metadata = {
 		countryName: "France",
 		images: [
 			{
-				url: "/og-image.png",
+				url: `${BASE_URL}/og-image.png`,
 				width: 1200,
 				height: 630,
 				alt: "Kombuciao - Trouvez votre Ciao Kombucha",
@@ -70,9 +69,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
 	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="fr">
 			<head>
