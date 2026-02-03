@@ -1,52 +1,29 @@
-# Kombuciao Backend
+# Kombuciao Data Management Scripts
 
-[![Node.js](https://img.shields.io/badge/Node.js-14+-green.svg?style=for-the-badge&logo=node.js)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-5.1.0-black.svg?style=for-the-badge&logo=express)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
-[![Mongoose](https://img.shields.io/badge/Mongoose-8.16.1-orange.svg?style=for-the-badge)](https://mongoosejs.com/)
 [![Python](https://img.shields.io/badge/Python-3.7+-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 
-A Node.js backend application for managing store data with MongoDB integration, Python data import scripts, and community-driven flavor availability reporting.
+Python scripts for importing and managing store data from the French government's BANCO database into MongoDB.
+
+> **Note**: The Express.js API backend has been consolidated into the Next.js frontend application (see `frontend/lib/server/`). This directory now only contains data management utilities.
 
 ## Overview
 
-This backend provides:
+This directory provides Python scripts for:
 
-- Store data management with MongoDB
-- Geospatial queries for store locations
-- Community-driven flavor availability reporting system
-- Python script for importing French commercial data (BANCO database)
-- RESTful API endpoints for store and report operations
-- CORS support for frontend integration
+- **Importing store data** from BANCO (Base Nationale des Commerces Ouverte)
+- **Updating store types** for existing records
+- **Automated deduplication** by OSM ID
+- **Timestamp-based updates** to avoid unnecessary re-imports
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
 - Python 3.7+
 - MongoDB Atlas account or local MongoDB instance
 
 ## Installation
 
-### 1. Clone and Setup Node.js Environment
-
-```bash
-cd backend
-npm install
-```
-
-### 2. Environment Configuration
-
-Create a `.env` file in the backend directory with your MongoDB connection string:
-
-```env
-MONGODB_URI="your_mongodb_connection_string"
-PORT=8080
-NODE_ENV="development"
-```
-
-### 3. Python Environment Setup (for Data Import)
-
-The [`banco_to_mongo.py`](scripts/banco_to_mongo.py) script requires a separate Python environment:
+### 1. Python Environment Setup
 
 ```bash
 # Create virtual environment
@@ -62,231 +39,212 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 2. Environment Configuration
+
+Create a `.env` file in the backend directory:
+
+```env
+MONGODB_URI="your_mongodb_connection_string"
+```
+
 ## Project Structure
 
 ```
 backend/
-├── config/
-│   ├── index.js           # Configuration management
-│   └── db.js              # Database connection
-├── controllers/
-│   ├── store.js           # Store business logic
-│   └── report.js          # Report business logic
-├── models/
-│   ├── store.js           # Store MongoDB schema
-│   └── report.js          # Report MongoDB schema
-├── routes/
-│   ├── store.js           # Store API routes
-│   └── report.js          # Report API routes
 ├── scripts/
-│   └── banco_to_mongo.py  # Python data import script
-├── .env                   # Environment variables
-├── .gitignore            # Git ignore rules
-├── requirements.txt      # Python dependencies
-├── package.json          # Node.js dependencies
-└── server.js             # Main application entry point
+│   ├── banco_to_mongo.py   # Import BANCO data
+│   └── update_types.py     # Update store types
+├── .env                    # Environment variables
+├── .gitignore             # Git ignore rules
+├── requirements.txt       # Python dependencies
+└── README.md              # This file
 ```
 
-## Usage
+## Scripts
 
-### Starting the Application
+### `banco_to_mongo.py` - Import Store Data
+
+Imports store data from the French government's BANCO database.
+
+**Features:**
+
+- Downloads latest CSV data from data.gouv.fr
+- Filters for relevant store types (supermarkets, convenience, grocery, organic)
+- Upserts into MongoDB with deduplication by `osmId`
+- Checks timestamps to avoid unnecessary re-imports
+
+**Usage:**
 
 ```bash
-npm start
-# or for development with auto-reload:
-npm run dev
+python scripts/banco_to_mongo.py
 ```
 
-The server will start on `http://localhost:8080` (or your configured PORT).
+### `update_types.py` - Update Store Types
 
-### Importing Store Data
+Updates the `types` field for existing stores without creating new ones.
 
-The Python script [`banco_to_mongo.py`](scripts/banco_to_mongo.py) imports French commercial establishment data:
+**Usage:**
 
-1. **Activate Python virtual environment:**
+```bash
+python scripts/update_types.py
+```
 
-   ```bash
-   # Windows:
-   venv\Scripts\activate
-   # macOS/Linux:
-   source venv/bin/activate
-   ```
+## Running the Scripts
 
-2. **Run the import script:**
-   ```bash
-   python scripts/banco_to_mongo.py
-   ```
+```bash
+# Activate virtual environment
+venv\Scripts\activate  # Windows
+# or
+source venv/bin/activate  # macOS/Linux
 
-The script will:
+# Run import script
+python scripts/banco_to_mongo.py
 
-- Download the latest BANCO dataset from data.gouv.fr
-- Filter for supermarkets, convenience stores, grocery stores, and organic shops
-- Import data into MongoDB with geospatial indexing
-- Create unique indexes to prevent duplicates (name + coordinates)
+# Or update types
+python scripts/update_types.py
+```
 
-## Database Schema
+## Python Dependencies
 
-### Store Model
+The `requirements.txt` includes:
 
-The [`Store`](models/store.js) model includes:
+- **pandas** - Data manipulation and CSV processing
+- **requests** - HTTP client for downloading data
+- **pymongo** - MongoDB driver
+- **tqdm** - Progress bars
+- **python-dotenv** - Environment variable management
+
+## When to Run Scripts
+
+### `banco_to_mongo.py`
+
+Run when you need to:
+
+- Import initial store data
+- Update store information from BANCO
+- Add new stores that appeared in BANCO
+
+The script automatically checks timestamps to avoid re-importing unchanged data.
+
+### `update_types.py`
+
+Run when:
+
+- Store type classifications change in BANCO
+- You need to refresh the `types` field for existing stores
+
+## Data Source
+
+Store data comes from [BANCO (Base Nationale des Commerces Ouverte)](https://www.data.gouv.fr/datasets/base-nationale-des-commerces-ouverte/), a French public database of commercial establishments.
+
+**Filtered store types:**
+
+- Supermarket
+- Convenience store
+- Grocery store
+- Organic shop
+
+## MongoDB Collections
+
+The scripts populate the `stores` collection with this schema:
 
 ```javascript
 {
-  name: String (required),
+  name: String,
   address: {
     street: String,
     postcode: String,
     city: String
   },
   location: {
-    type: "Point",                    // GeoJSON Point
+    type: "Point",                     // GeoJSON Point
     coordinates: [longitude, latitude] // [lng, lat]
   },
-  openingHours: String,              // e.g., "Mon-Fri 9-18"
-  types: [String],                   // e.g., ["supermarket", "organic"]
-  createdAt: Date,                   // Auto-generated
-  updatedAt: Date                    // Auto-generated
+  openingHours: String,
+  types: [String],                     // e.g., ["supermarket", "organic"]
+  osmId: String,                       // Unique OSM identifier
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
 
-### Report Model
+## Troubleshooting
 
-The [`Report`](models/report.js) model for community flavor availability:
+**Connection errors:**
 
-```javascript
-{
-  store: ObjectId (required),        // Reference to Store
-  flavors: [String],                 // Available flavors
-  description: String,               // Optional description
-  votes: [{
-    voterId: String (required),      // Anonymous voter ID
-    type: "confirm" | "deny",        // Vote type
-    createdAt: Date                  // Auto-generated
-  }],
-  createdAt: Date,                   // Auto-generated
-  updatedAt: Date                    // Auto-generated
-}
-```
+- Verify `MONGODB_URI` in `.env`
+- Check MongoDB Atlas network access settings
+- Ensure your IP is whitelisted
 
-## API Endpoints
+**Import fails:**
 
-### Store Endpoints (`/stores`)
+- Check internet connection (script downloads from data.gouv.fr)
+- Verify Python dependencies are installed
+- Check MongoDB disk space
 
-- `POST /stores` - Create a new store
-- `GET /stores` - List all stores (with optional geospatial filtering)
-- `GET /stores/:id` - Get a specific store by ID
-- `PUT /stores/:id` - Update a store
-- `DELETE /stores/:id` - Delete a store
+**No stores imported:**
 
-### Report Endpoints (`/reports`)
+- Verify the ALLOWED_TYPES filter matches your needs
+- Check the CSV structure hasn't changed
 
-- `POST /reports` - Create a new flavor availability report
-- `GET /reports` - List all reports (with optional filtering)
-- `GET /reports/:id` - Get a specific report
-- `POST /reports/:id/confirm` - Confirm a report
-- `POST /reports/:id/deny` - Deny a report
-- `DELETE /reports/:id` - Delete a report
+## Automation
 
-### Geospatial Queries
+Consider scheduling these scripts to run periodically:
 
-The `GET /stores` endpoint supports location-based filtering:
+**Windows Task Scheduler:**
 
 ```bash
-# Find stores near a location (within 5km by default)
-GET /stores?lat=48.8566&lng=2.3522
-
-# Specify custom radius (in meters)
-GET /stores?lat=48.8566&lng=2.3522&radius=10000
-
-# Filter by flavor availability
-GET /stores?flavor=citron&flavor=peche
-
-# Only show stores with recent availability
-GET /stores?onlyAvailable=true
-
-# Pagination
-GET /stores?page=1&pageSize=20
+# Create a batch file: update_stores.bat
+cd C:\path\to\kombuciao\backend
+venv\Scripts\activate
+python scripts\banco_to_mongo.py
 ```
 
-### Example API Usage
+**Linux/Mac cron:**
 
 ```bash
-# Create a store
-curl -X POST http://localhost:8080/stores \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Bio Market",
-    "address": {"street": "123 Main St", "city": "Paris", "postcode": "75001"},
-    "location": {"type": "Point", "coordinates": [2.3522, 48.8566]},
-    "openingHours": "Mon-Sat 9-19",
-    "types": ["organic", "supermarket"]
-  }'
-
-# Create a flavor availability report
-curl -X POST http://localhost:8080/reports \
-  -H "Content-Type: application/json" \
-  -d '{
-    "store": "store_id_here",
-    "flavors": ["citron", "peche", "fruits_rouges"],
-    "description": "Saw these flavors today!"
-  }'
-
-# Get nearby stores with flavor filtering
-curl "http://localhost:8080/stores?lat=48.8566&lng=2.3522&radius=5000&flavor=citron&onlyAvailable=true"
+# Add to crontab (run weekly on Sunday at 2 AM)
+0 2 * * 0 cd /path/to/kombuciao/backend && source venv/bin/activate && python scripts/banco_to_mongo.py
 ```
 
-## Dependencies
+## Migration Note
 
-### Node.js Dependencies
+The Express.js API server that was previously in this directory has been consolidated into the Next.js frontend application. All API functionality is now available at `frontend/app/api/` and `frontend/lib/server/`.
 
-- `express` - Web framework
-- `mongoose` - MongoDB object modeling
-- `cors` - Cross-origin resource sharing
-- `dotenv` - Environment variable management
-- `nodemon` (dev) - Development auto-reload
+**What was moved:**
 
-### Python Dependencies
+- ✅ Models → `frontend/lib/server/models/`
+- ✅ Controllers → `frontend/lib/server/controllers/`
+- ✅ Middleware → `frontend/lib/server/middleware/`
+- ✅ Routes → `frontend/app/api/`
+- ✅ DB config → `frontend/lib/server/config/`
 
-- `pandas` - Data manipulation and CSV processing
-- `pymongo` - MongoDB Python driver
-- `tqdm` - Progress bars for data import
-- `requests` - HTTP requests for downloading BANCO data
+**What remains here:**
 
-## Environment Variables
-
-Required environment variables:
-
-```env
-MONGODB_URI="mongodb://localhost:27017" # or your MongoDB Atlas connection string
-PORT=8080                               # Server port (optional, defaults to 8080)
-NODE_ENV="development"                  # Environment mode (optional)
-```
-
-## Error Handling
-
-The API includes comprehensive error handling:
-
-- Input validation for required fields
-- Proper HTTP status codes
-- Detailed error messages
-- Global error handler for uncaught exceptions
-
-## Community Features
-
-The backend supports community-driven features:
-
-- **Flavor Availability Reports**: Users can report which flavors are available at specific stores
-- **Voting System**: Community members can confirm or deny reports to maintain data quality
-- **Anonymous Voting**: Uses voter IDs to prevent spam while maintaining privacy
-- **Filtering**: Frontend can filter stores based on recent availability reports
-
-## 🔒 API Security
-
-The backend is now protected by API key authentication. All requests from the frontend are securely proxied through Next.js API routes, ensuring that the API key is never exposed to the browser and only authorized requests can access protected endpoints.
+- Python data import scripts (these are independent utilities)
 
 ## Contributing
 
-The backend is fully functional with implemented:
+These data import scripts are maintained alongside the main Kombuciao application. Feel free to:
+
+- Report issues with data imports
+- Suggest improvements to filtering logic
+- Contribute new data sources
+- Optimize import performance
+
+See the main [README](../README.md) for contributing guidelines.
+
+## License
+
+This project is distributed under the **Polyform Noncommercial 1.0.0** license. See [LICENSE](../LICENSE) for details.
+
+## Related Documentation
+
+- [Main Project README](../README.md)
+- [Frontend Documentation](../frontend/README.md)
+- [BANCO Data Source](https://www.data.gouv.fr/datasets/base-nationale-des-commerces-ouverte/)
+
+## Features
 
 - ✅ Store CRUD operations
 - ✅ Geospatial queries with MongoDB

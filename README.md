@@ -8,11 +8,13 @@
 [![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-38B2AC.svg?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 
-A _source-available_ platform to locate stores selling Ciao Kombucha near you.
+A _source-available_ full-stack platform to locate stores selling Ciao Kombucha near you.
+
+> **February 2026 Update**: The backend has been consolidated into the Next.js frontend application for improved performance, simpler deployment, and better developer experience. The `backend/` folder now only contains Python data management scripts.
 
 ## 🍃 About
 
-Kombuciao is a complete web application that helps you quickly find where to buy Ciao Kombucha. The application uses geolocation to show you nearby stores with available flavors, powered by an active community of Squeezos.
+Kombuciao is a complete full-stack web application that helps you quickly find where to buy Ciao Kombucha. The application uses geolocation to show you nearby stores with available flavors, powered by an active community of Squeezos.
 
 ## ✨ Features
 
@@ -28,23 +30,23 @@ Kombuciao is a complete web application that helps you quickly find where to buy
 
 ## 🏗️ Architecture
 
-The project is divided into two main parts:
+Kombuciao is a modern full-stack Next.js application with integrated backend functionality:
 
-### Frontend (`/frontend`)
+### Frontend + Backend (`/frontend`)
 
-- **Next.js 15** with React 19 and TypeScript
-- **Tailwind CSS** for styling
-- **Leaflet** for interactive maps
-- **shadcn/ui** for components
-- **Mobile-first responsive design**
+- **Next.js 15** with App Router - Full-stack framework
+- **React 19** and TypeScript - UI and type safety
+- **Next.js API Routes** - RESTful API endpoints
+- **MongoDB + Mongoose** - Database and ODM
+- **Tailwind CSS** - Modern styling
+- **Leaflet** - Interactive maps
+- **shadcn/ui** - Beautiful components
 
-### Backend (`/backend`)
+### Data Management (`/backend`)
 
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **Python scripts** for data import
-- **RESTful API** with CORS
-- **Geolocation** and spatial queries
+- **Python scripts** for importing BANCO data
+- **pymongo** - Direct MongoDB access for bulk operations
+- **Github Actions** workflow for automated store data updates
 
 ## 📊 Data Sources
 
@@ -69,7 +71,7 @@ Information about flavor availability is based on community reports. Each user c
 - MongoDB (local or Atlas)
 - npm, yarn, pnpm or bun
 
-### Complete Installation
+### Installation
 
 1. **Clone the repository:**
 
@@ -78,137 +80,147 @@ git clone https://github.com/atinyshrimp/kombuciao.git
 cd kombuciao
 ```
 
-2. **Create an .env file**
+2. **Set up the frontend (includes API):**
+
+```bash
+cd frontend
+npm install
+```
+
+3. **Configure environment variables:**
+
+Create `frontend/.env`:
 
 ```env
 MONGODB_URI="your_mongodb_connection_string"
-PORT=8080
-NODE_ENV="development"
+API_KEY="your_secure_api_key"
 ```
 
-3. **Set up the backend:**
-
-```bash
-cd backend
-npm install
-
-# Set up Python environment for data import
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-```
-
-3. **Set up the frontend:**
-
-```bash
-cd ../frontend
-npm install
-```
-
-4. **Import store data:**
+4. **Set up Python for data import:**
 
 ```bash
 cd ../backend
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+python -m venv venv
+venv\Scripts\activate  # Windows
+# or: source venv/bin/activate  # macOS/Linux
+pip install -r requirements.txt
+```
+
+Create `backend/.env`:
+
+```env
+MONGODB_URI="your_mongodb_connection_string"
+```
+
+5. **Import store data:**
+
+```bash
 python scripts/banco_to_mongo.py
 ```
 
-5. **Start the servers:**
+6. **Start the development server:**
 
 ```bash
-# Terminal 1 - Backend
-cd backend
-npm run dev
-
-# Terminal 2 - Frontend
-cd frontend
+cd ../frontend
 npm run dev
 ```
 
-6. **Open your browser:**
-   - Frontend: [http://localhost:3000](http://localhost:3000)
-   - Backend API: [http://localhost:8080](http://localhost:8080)
+7. **Open your browser:**
+   - Application: [http://localhost:3000](http://localhost:3000)
+   - API endpoints available at `/api/*`
 
 ## 🛠️ Technologies Used
 
-### Frontend
+### Full-Stack Application (Frontend)
 
-- **Framework**: Next.js 15, React 19, TypeScript
+- **Framework**: Next.js 15 with App Router
+- **Runtime**: React 19
+- **Language**: TypeScript 5
 - **Styling**: Tailwind CSS 4
-- **Maps**: Leaflet, react-leaflet
-- **UI Components**: shadcn/ui, Radix UI
+- **Database**: MongoDB with Mongoose ODM
+- **Maps**: Leaflet + React Leaflet
+- **UI Components**: shadcn/ui (Radix UI)
 - **Icons**: Lucide React
 - **Notifications**: Sonner
 - **State Management**: React Context
 
-### Backend
-
-- **Runtime**: Node.js
-- **Framework**: Express.js 5.1.0
-- **Database**: MongoDB with Mongoose 8.16.1
-- **CORS**: 2.8.5
-- **Environment**: dotenv 17.0.0
-- **Development**: nodemon 3.1.10
-
-### Data Import
+### Data Import Scripts (Backend)
 
 - **Language**: Python 3.7+
 - **Data Processing**: pandas
-- **MongoDB**: pymongo
+- **Database**: pymongo
+- **HTTP**: requests
+- **Progress**: tqdm
 
 ## 📁 Project Structure
 
 ```
 kombuciao/
-├── frontend/                 # Next.js application
-│   ├── app/                 # Pages and layouts
-│   ├── components/          # React components
-│   │   ├── cards/          # Store cards
-│   │   ├── features/       # Features
-│   │   ├── map/            # Map components
-│   │   └── ui/             # UI components
-│   ├── lib/                # Utilities and API
-│   ├── types/              # TypeScript types
-│   └── public/             # Static assets
-├── backend/                 # Node.js API
-│   ├── config/             # Configuration
-│   ├── controllers/        # Business logic
-│   ├── models/             # MongoDB schemas
-│   ├── routes/             # API routes
-│   ├── scripts/            # Python scripts
-│   └── server.js           # Entry point
-└── README.md               # This file
+├── frontend/                     # Next.js full-stack application
+│   ├── app/
+│   │   ├── api/                 # API routes (backend endpoints)
+│   │   │   ├── stores/         # Store CRUD operations
+│   │   │   └── reports/        # Report & voting system
+│   │   ├── page.tsx            # Main page
+│   │   └── layout.tsx          # Root layout
+│   ├── components/              # React components
+│   │   ├── cards/              # Store cards
+│   │   ├── features/           # Feature components
+│   │   ├── map/                # Map components
+│   │   └── ui/                 # UI components (shadcn)
+│   ├── lib/
+│   │   ├── server/             # Server-side code
+│   │   │   ├── config/        # DB connection
+│   │   │   ├── models/        # MongoDB schemas
+│   │   │   ├── controllers/   # Business logic
+│   │   │   └── middleware/    # Auth & validation
+│   │   └── utils.ts           # Client utilities
+│   └── types/                  # TypeScript types
+├── backend/                     # Data management scripts
+│   ├── scripts/
+│   │   ├── banco_to_mongo.py   # Import BANCO data
+│   │   └── update_types.py     # Update store types
+│   └── requirements.txt        # Python dependencies
+└── README.md                   # This file
 ```
 
 ## 🔌 API Endpoints
 
-### Stores (`/stores`)
+All API endpoints are now integrated into Next.js at `/api/*`:
 
-- `GET /stores` - List stores with geospatial filters
-- `POST /stores` - Create a store
-- `GET /stores/:id` - Get store details
-- `PUT /stores/:id` - Update a store
-- `DELETE /stores/:id` - Delete a store
+### Stores
 
-### Reports (`/reports`)
+- `GET /api/stores` - List stores with geospatial filters\
+  Query parameters:
+  - `lat`, `lng`: Geographic coordinates for proximity search
+  - `radius`: Search radius in meters (default: 5000)
+  - `name`: Filter by store name (case-insensitive)
+  - `flavor`: Filter by available flavors (can use multiple)
+  - `onlyAvailable`: Show only stores with recent reports (boolean)
+  - `page`, `pageSize`: Pagination parameters
+- `GET /api/stores/stats` - Get store statistics
+- `GET /api/stores/:id` - Get store details
+- `POST /api/stores` - Create a store (requires API key)
+- `PUT /api/stores/:id` - Update a store (requires API key)
+- `DELETE /api/stores/:id` - Delete a store (requires API key)
 
-- `GET /reports` - List availability reports
-- `POST /reports` - Create a report
-- `POST /reports/:id/confirm` - Confirm a report
-- `POST /reports/:id/deny` - Deny a report
-- `DELETE /reports/:id` - Delete a report
+### Reports
 
-### Available Filters
-
-- `lat`, `lng`: Geographic coordinates
-- `radius`: Search radius (in meters)
-- `flavor`: Filter by flavor (multiple)
-- `onlyAvailable`: Only stores with recent availability
-- `page`, `pageSize`: Pagination
+- `GET /api/reports` - List availability reports\
+  Query parameters:
+  - `storeId`:
+  - `since`:
+  - `page`, `pageSize`: Pagination parameters
+- `GET /api/reports/:id` - Get specific report
+- `POST /api/reports` - Create a report (requires API key)
+- `POST /api/reports/:id/vote` - Vote on report (requires API key)
+- `DELETE /api/reports/:id/vote/:voteId` - Delete vote (requires API key)
+- `DELETE /api/reports/:id` - Delete a report (requires API key)
 
 ## 🔒 API Security
 
-All API calls from the frontend to the backend are now securely proxied through Next.js API routes. These API routes inject the API key server-side, ensuring that secrets are never exposed to the browser. This setup guarantees secure communication between the frontend and backend, and prevents unauthorized access to protected endpoints.
+Protected endpoints (`POST`, `DELETE`) require an `x-api-key` header. The API key is stored securely server-side and never exposed to the browser.\
+This applies only for **external requests**.
 
 ## 🗄️ Database
 
@@ -247,32 +259,25 @@ All API calls from the frontend to the backend are now securely proxied through 
 
 ## 🚀 Deployment
 
-### Environment Variables
+### Vercel (Recommended)
 
-#### Backend (.env)
+1. **Deploy the frontend directory** (contains everything)
+2. **Set environment variables** in Vercel dashboard:
+   ```
+   MONGODB_URI=your_mongodb_connection_string
+   API_KEY=your_secure_api_key
+   ```
+3. That's it! The API is bundled with the frontend.
 
-```env
-MONGODB_URI="your_mongodb_connection_string"
-PORT=8080
-NODE_ENV="production"
-```
-
-#### Frontend
-
-The frontend uses Next.js environment variables for API configuration.
-
-### Production
+### Manual Deployment
 
 ```bash
-# Backend
-cd backend
-npm start
-
-# Frontend
 cd frontend
 npm run build
 npm start
 ```
+
+The application serves both the frontend and API from a single process.
 
 ## 🤝 Contributing
 

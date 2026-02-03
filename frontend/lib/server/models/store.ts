@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const StoreSchema = new mongoose.Schema(
 	{
@@ -22,4 +22,5 @@ const StoreSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model("store", StoreSchema);
+// Prevent model recompilation during hot reloads in development
+export default mongoose.models.store || mongoose.model("store", StoreSchema);

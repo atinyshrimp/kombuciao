@@ -4,12 +4,15 @@
 [![React](https://img.shields.io/badge/React-19-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue.svg?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-4-38B2AC.svg?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-8-green.svg?style=for-the-badge&logo=mongodb)](https://www.mongodb.com/)
 
-A _source-available_ platform to locate stores selling Ciao Kombucha near you.
+A _source-available_ full-stack platform to locate stores selling Ciao Kombucha near you.
+
+> **Note**: As of February 2026, the backend has been consolidated into this Next.js application.
 
 ## 🍃 About
 
-Kombuciao is a web application that helps you quickly find where to buy Ciao Kombucha. The application uses geolocation to show you nearby stores with available flavors.
+Kombuciao is a full-stack web application that helps you quickly find where to buy Ciao Kombucha. The application uses geolocation to show you nearby stores with available flavors.
 
 ## ✨ Features
 
@@ -41,6 +44,7 @@ Information about flavor availability is based on community reports. Each user c
 
 - Node.js 18+
 - npm, yarn, pnpm or bun
+- MongoDB database (local or Atlas)
 
 ### Installation
 
@@ -61,7 +65,16 @@ yarn install
 pnpm install
 ```
 
-3. **Start the development server:**
+3. **Set up environment variables:**
+
+Create a `.env` file in the frontend directory:
+
+```bash
+MONGODB_URI=your_mongodb_connection_string
+API_KEY=your_secure_api_key
+```
+
+4. **Start the development server:**
 
 ```bash
 npm run dev
@@ -71,16 +84,27 @@ yarn dev
 pnpm dev
 ```
 
-4. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
+5. **Open [http://localhost:3000](http://localhost:3000) in your browser.**
 
 ## 🛠️ Technologies Used
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS
-- **Maps**: Leaflet
-- **UI Components**: shadcn/ui
+### Frontend
+
+- **Framework**: Next.js 15 (App Router)
+- **UI Library**: React 19
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **Maps**: Leaflet + React Leaflet
+- **UI Components**: shadcn/ui (Radix UI)
 - **Icons**: Lucide React
 - **Notifications**: Sonner
+
+### Backend (Integrated into Next.js)
+
+- **API**: Next.js API Routes
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: API Key middleware for external requests
+- **Geospatial**: MongoDB GeoJSON queries
 
 ## 📄 License
 

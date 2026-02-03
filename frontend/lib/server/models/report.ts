@@ -1,16 +1,9 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const voteSchema = new mongoose.Schema(
 	{
-		voterId: {
-			type: String,
-			required: true,
-		},
-		type: {
-			type: String,
-			enum: ["confirm", "deny"],
-			required: true,
-		},
+		voterId: { type: String, required: true },
+		type: { type: String, enum: ["confirm", "deny"], required: true },
 	},
 	{ timestamps: { createdAt: true, updatedAt: false } }
 );
@@ -35,13 +28,11 @@ const reportSchema = new mongoose.Schema(
 				],
 			},
 		],
-		description: {
-			type: String,
-			default: "",
-		},
+		description: { type: String, default: "" },
 		votes: [voteSchema],
 	},
 	{ timestamps: true }
 );
 
-module.exports = mongoose.model("Report", reportSchema);
+// Prevent model recompilation during hot reloads in development
+export default mongoose.models.report || mongoose.model("report", reportSchema);

@@ -1,4 +1,9 @@
+"use server";
+
 import { getUserId } from "@/lib/utils";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const apiURL = "/api";
 
@@ -15,14 +20,7 @@ class api {
 	get(path: string): Promise<ApiResponse> {
 		return new Promise(async (resolve, reject) => {
 			try {
-				const response = await fetch(`${apiURL}${path}`, {
-					mode: "cors",
-					method: "GET",
-					credentials: "include",
-					headers: {
-						"Kombuciao-Voter-Id": getUserId() || "",
-					},
-				});
+				const response = await fetch(`${apiURL}${path}`, { method: "GET" });
 
 				const res = await response.json();
 				resolve(res);
@@ -36,11 +34,10 @@ class api {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const response = await fetch(`${apiURL}${path}`, {
-					mode: "cors",
 					method: "PUT",
-					credentials: "include",
 					headers: {
 						"Kombuciao-Voter-Id": getUserId() || "",
+						"Content-Type": "application/json",
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
@@ -57,12 +54,8 @@ class api {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const response = await fetch(`${apiURL}${path}`, {
-					mode: "cors",
-					credentials: "include",
 					method: "DELETE",
-					headers: {
-						"Kombuciao-Voter-Id": getUserId() || "",
-					},
+					headers: { "Kombuciao-Voter-Id": getUserId() || "" },
 				});
 				const res = await response.json();
 				resolve(res);
@@ -76,15 +69,13 @@ class api {
 		return new Promise(async (resolve, reject) => {
 			try {
 				const response = await fetch(`${apiURL}${path}`, {
-					mode: "cors",
 					method: "POST",
-					credentials: "include",
 					headers: {
 						"Kombuciao-Voter-Id": getUserId() || "",
+						"Content-Type": "application/json",
 					},
 					body: typeof body === "string" ? body : JSON.stringify(body),
 				});
-
 				const res = await response.json();
 				resolve(res);
 			} catch (e) {
